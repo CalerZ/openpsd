@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caler.zkl.openpsd.mapper.StockMapper">
+  <resultMap id="BaseResultMap" type="com.caler.zkl.openpsd.bean.Stock">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="safety_stock" jdbcType="DOUBLE" property="safetyStock" />
+    <result column="last_month_quantity" jdbcType="DOUBLE" property="lastMonthQuantity" />
+    <result column="on_hand_inventory" jdbcType="DOUBLE" property="onHandInventory" />
+    <result column="reported_quantity" jdbcType="DOUBLE" property="reportedQuantity" />
+    <result column="product_id" jdbcType="BIGINT" property="productId" />
+    <result column="product_code" jdbcType="VARCHAR" property="productCode" />
+    <result column="purchase_method" jdbcType="BIGINT" property="purchaseMethod" />
+    <result column="prod_line_members" jdbcType="INTEGER" property="prodLineMembers" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, safety_stock, last_month_quantity, on_hand_inventory, reported_quantity, product_id, 
+    product_code, purchase_method, prod_line_members
+  </sql>
+  <select id="selectByExample" parameterType="com.caler.zkl.openpsd.bean.StockExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from stock
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from stock
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from stock
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.caler.zkl.openpsd.bean.StockExample">
+    delete from stock
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.caler.zkl.openpsd.bean.Stock">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into stock (safety_stock, last_month_quantity, on_hand_inventory, 
+      reported_quantity, product_id, product_code, 
+      purchase_method, prod_line_members)
+    values (#{safetyStock,jdbcType=DOUBLE}, #{lastMonthQuantity,jdbcType=DOUBLE}, #{onHandInventory,jdbcType=DOUBLE}, 
+      #{reportedQuantity,jdbcType=DOUBLE}, #{productId,jdbcType=BIGINT}, #{productCode,jdbcType=VARCHAR}, 
+      #{purchaseMethod,jdbcType=BIGINT}, #{prodLineMembers,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.caler.zkl.openpsd.bean.Stock">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into stock
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="safetyStock != null">
+        safety_stock,
+      </if>
+      <if test="lastMonthQuantity != null">
+        last_month_quantity,
+      </if>
+      <if test="onHandInventory != null">
+        on_hand_inventory,
+      </if>
+      <if test="reportedQuantity != null">
+        reported_quantity,
+      </if>
+      <if test="productId != null">
+        product_id,
+      </if>
+      <if test="productCode != null">
+        product_code,
+      </if>
+      <if test="purchaseMethod != null">
+        purchase_method,
+      </if>
+      <if test="prodLineMembers != null">
+        prod_line_members,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="safetyStock != null">
+        #{safetyStock,jdbcType=DOUBLE},
+      </if>
+      <if test="lastMonthQuantity != null">
+        #{lastMonthQuantity,jdbcType=DOUBLE},
+      </if>
+      <if test="onHandInventory != null">
+        #{onHandInventory,jdbcType=DOUBLE},
+      </if>
+      <if test="reportedQuantity != null">
+        #{reportedQuantity,jdbcType=DOUBLE},
+      </if>
+      <if test="productId != null">
+        #{productId,jdbcType=BIGINT},
+      </if>
+      <if test="productCode != null">
+        #{productCode,jdbcType=VARCHAR},
+      </if>
+      <if test="purchaseMethod != null">
+        #{purchaseMethod,jdbcType=BIGINT},
+      </if>
+      <if test="prodLineMembers != null">
+        #{prodLineMembers,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.caler.zkl.openpsd.bean.StockExample" resultType="java.lang.Long">
+    select count(*) from stock
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update stock
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.safetyStock != null">
+        safety_stock = #{record.safetyStock,jdbcType=DOUBLE},
+      </if>
+      <if test="record.lastMonthQuantity != null">
+        last_month_quantity = #{record.lastMonthQuantity,jdbcType=DOUBLE},
+      </if>
+      <if test="record.onHandInventory != null">
+        on_hand_inventory = #{record.onHandInventory,jdbcType=DOUBLE},
+      </if>
+      <if test="record.reportedQuantity != null">
+        reported_quantity = #{record.reportedQuantity,jdbcType=DOUBLE},
+      </if>
+      <if test="record.productId != null">
+        product_id = #{record.productId,jdbcType=BIGINT},
+      </if>
+      <if test="record.productCode != null">
+        product_code = #{record.productCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.purchaseMethod != null">
+        purchase_method = #{record.purchaseMethod,jdbcType=BIGINT},
+      </if>
+      <if test="record.prodLineMembers != null">
+        prod_line_members = #{record.prodLineMembers,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update stock
+    set id = #{record.id,jdbcType=BIGINT},
+      safety_stock = #{record.safetyStock,jdbcType=DOUBLE},
+      last_month_quantity = #{record.lastMonthQuantity,jdbcType=DOUBLE},
+      on_hand_inventory = #{record.onHandInventory,jdbcType=DOUBLE},
+      reported_quantity = #{record.reportedQuantity,jdbcType=DOUBLE},
+      product_id = #{record.productId,jdbcType=BIGINT},
+      product_code = #{record.productCode,jdbcType=VARCHAR},
+      purchase_method = #{record.purchaseMethod,jdbcType=BIGINT},
+      prod_line_members = #{record.prodLineMembers,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.caler.zkl.openpsd.bean.Stock">
+    update stock
+    <set>
+      <if test="safetyStock != null">
+        safety_stock = #{safetyStock,jdbcType=DOUBLE},
+      </if>
+      <if test="lastMonthQuantity != null">
+        last_month_quantity = #{lastMonthQuantity,jdbcType=DOUBLE},
+      </if>
+      <if test="onHandInventory != null">
+        on_hand_inventory = #{onHandInventory,jdbcType=DOUBLE},
+      </if>
+      <if test="reportedQuantity != null">
+        reported_quantity = #{reportedQuantity,jdbcType=DOUBLE},
+      </if>
+      <if test="productId != null">
+        product_id = #{productId,jdbcType=BIGINT},
+      </if>
+      <if test="productCode != null">
+        product_code = #{productCode,jdbcType=VARCHAR},
+      </if>
+      <if test="purchaseMethod != null">
+        purchase_method = #{purchaseMethod,jdbcType=BIGINT},
+      </if>
+      <if test="prodLineMembers != null">
+        prod_line_members = #{prodLineMembers,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.caler.zkl.openpsd.bean.Stock">
+    update stock
+    set safety_stock = #{safetyStock,jdbcType=DOUBLE},
+      last_month_quantity = #{lastMonthQuantity,jdbcType=DOUBLE},
+      on_hand_inventory = #{onHandInventory,jdbcType=DOUBLE},
+      reported_quantity = #{reportedQuantity,jdbcType=DOUBLE},
+      product_id = #{productId,jdbcType=BIGINT},
+      product_code = #{productCode,jdbcType=VARCHAR},
+      purchase_method = #{purchaseMethod,jdbcType=BIGINT},
+      prod_line_members = #{prodLineMembers,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

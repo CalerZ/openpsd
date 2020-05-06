@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caler.zkl.openpsd.mapper.MemberDao">
+
+
+    <select id="selectRoleByMemberId" resultMap="com.caler.zkl.openpsd.mapper.RoleMapper.BaseResultMap">
+  SELECT b.* FROM role_member_relation a,role b
+    WHERE  a.role_id = b.id and b.status=1 AND a.resource_id = #{id}
+
+  </select>
+
+  <select id="selectMenuByMemberId" resultMap="com.caler.zkl.openpsd.mapper.MenuMapper.BaseResultMap">
+SELECT DISTINCT d.* FROM role_member_relation a,role b,role_menu_relation c, menu d
+WHERE  a.role_id = b.id and b.status=1   AND c.role_id = b.id AND c.menu_id =d.id and d.hidden=1 AND a.resource_id = #{id}
+
+  </select>
+
+  <select id="selectPermissionByMemberId" resultMap="com.caler.zkl.openpsd.mapper.PermissionMapper.BaseResultMap">
+SELECT DISTINCT d.* FROM role_member_relation a,role b,role_permission_relation c, permission d
+WHERE  a.role_id = b.id  and b.status=1  AND c.role_id = b.id AND c.permission_id =d.id and d.status=1 AND a.resource_id = #{id}
+  </select>
+
+
+  <select id="selectResourceByMemberId" resultMap="com.caler.zkl.openpsd.mapper.ResourceMapper.BaseResultMap">
+SELECT DISTINCT d.* FROM role_member_relation a,role b,role_resource_relation c, resource d
+WHERE  a.role_id = b.id and b.status=1  AND c.role_id = b.id AND c.resource_id =d.id  AND a.resource_id =  #{id}
+  </select>
+
+
+</mapper>

@@ -1,0 +1,606 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caler.zkl.openpsd.mapper.ApplicationProductMapper">
+  <resultMap id="BaseResultMap" type="com.caler.zkl.openpsd.bean.ApplicationProduct">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="product_id" jdbcType="BIGINT" property="productId" />
+    <result column="product_code" jdbcType="VARCHAR" property="productCode" />
+    <result column="type_1" jdbcType="BIGINT" property="type1" />
+    <result column="type_2" jdbcType="BIGINT" property="type2" />
+    <result column="product_name" jdbcType="VARCHAR" property="productName" />
+    <result column="mainid" jdbcType="BIGINT" property="mainid" />
+    <result column="specifications" jdbcType="VARCHAR" property="specifications" />
+    <result column="unit" jdbcType="BIGINT" property="unit" />
+    <result column="price" jdbcType="DOUBLE" property="price" />
+    <result column="standard" jdbcType="VARCHAR" property="standard" />
+    <result column="supplier_id" jdbcType="BIGINT" property="supplierId" />
+    <result column="safety_stock" jdbcType="DOUBLE" property="safetyStock" />
+    <result column="last_month_quantity" jdbcType="DOUBLE" property="lastMonthQuantity" />
+    <result column="on_hand_inventory" jdbcType="DOUBLE" property="onHandInventory" />
+    <result column="reported_quantity" jdbcType="DOUBLE" property="reportedQuantity" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+    <result column="record_time" jdbcType="TIMESTAMP" property="recordTime" />
+    <result column="record_on" jdbcType="BIGINT" property="recordOn" />
+    <result column="purchase_method" jdbcType="BIGINT" property="purchaseMethod" />
+    <result column="prod_line_members" jdbcType="INTEGER" property="prodLineMembers" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.caler.zkl.openpsd.bean.ApplicationProduct">
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+    <result column="note" jdbcType="LONGVARCHAR" property="note" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, product_id, product_code, type_1, type_2, product_name, mainid, specifications, 
+    unit, price, standard, supplier_id, safety_stock, last_month_quantity, on_hand_inventory, 
+    reported_quantity, sort, status, is_delete, record_time, record_on, purchase_method, 
+    prod_line_members
+  </sql>
+  <sql id="Blob_Column_List">
+    description, note
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.caler.zkl.openpsd.bean.ApplicationProductExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from application_product
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.caler.zkl.openpsd.bean.ApplicationProductExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from application_product
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from application_product
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from application_product
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.caler.zkl.openpsd.bean.ApplicationProductExample">
+    delete from application_product
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.caler.zkl.openpsd.bean.ApplicationProduct">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into application_product (product_id, product_code, type_1, 
+      type_2, product_name, mainid, 
+      specifications, unit, price, 
+      standard, supplier_id, safety_stock, 
+      last_month_quantity, on_hand_inventory, reported_quantity, 
+      sort, status, is_delete, 
+      record_time, record_on, purchase_method, 
+      prod_line_members, description, note
+      )
+    values (#{productId,jdbcType=BIGINT}, #{productCode,jdbcType=VARCHAR}, #{type1,jdbcType=BIGINT}, 
+      #{type2,jdbcType=BIGINT}, #{productName,jdbcType=VARCHAR}, #{mainid,jdbcType=BIGINT}, 
+      #{specifications,jdbcType=VARCHAR}, #{unit,jdbcType=BIGINT}, #{price,jdbcType=DOUBLE}, 
+      #{standard,jdbcType=VARCHAR}, #{supplierId,jdbcType=BIGINT}, #{safetyStock,jdbcType=DOUBLE}, 
+      #{lastMonthQuantity,jdbcType=DOUBLE}, #{onHandInventory,jdbcType=DOUBLE}, #{reportedQuantity,jdbcType=DOUBLE}, 
+      #{sort,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{isDelete,jdbcType=INTEGER}, 
+      #{recordTime,jdbcType=TIMESTAMP}, #{recordOn,jdbcType=BIGINT}, #{purchaseMethod,jdbcType=BIGINT}, 
+      #{prodLineMembers,jdbcType=INTEGER}, #{description,jdbcType=LONGVARCHAR}, #{note,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.caler.zkl.openpsd.bean.ApplicationProduct">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into application_product
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="productId != null">
+        product_id,
+      </if>
+      <if test="productCode != null">
+        product_code,
+      </if>
+      <if test="type1 != null">
+        type_1,
+      </if>
+      <if test="type2 != null">
+        type_2,
+      </if>
+      <if test="productName != null">
+        product_name,
+      </if>
+      <if test="mainid != null">
+        mainid,
+      </if>
+      <if test="specifications != null">
+        specifications,
+      </if>
+      <if test="unit != null">
+        unit,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+      <if test="standard != null">
+        standard,
+      </if>
+      <if test="supplierId != null">
+        supplier_id,
+      </if>
+      <if test="safetyStock != null">
+        safety_stock,
+      </if>
+      <if test="lastMonthQuantity != null">
+        last_month_quantity,
+      </if>
+      <if test="onHandInventory != null">
+        on_hand_inventory,
+      </if>
+      <if test="reportedQuantity != null">
+        reported_quantity,
+      </if>
+      <if test="sort != null">
+        sort,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="isDelete != null">
+        is_delete,
+      </if>
+      <if test="recordTime != null">
+        record_time,
+      </if>
+      <if test="recordOn != null">
+        record_on,
+      </if>
+      <if test="purchaseMethod != null">
+        purchase_method,
+      </if>
+      <if test="prodLineMembers != null">
+        prod_line_members,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="note != null">
+        note,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="productId != null">
+        #{productId,jdbcType=BIGINT},
+      </if>
+      <if test="productCode != null">
+        #{productCode,jdbcType=VARCHAR},
+      </if>
+      <if test="type1 != null">
+        #{type1,jdbcType=BIGINT},
+      </if>
+      <if test="type2 != null">
+        #{type2,jdbcType=BIGINT},
+      </if>
+      <if test="productName != null">
+        #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="mainid != null">
+        #{mainid,jdbcType=BIGINT},
+      </if>
+      <if test="specifications != null">
+        #{specifications,jdbcType=VARCHAR},
+      </if>
+      <if test="unit != null">
+        #{unit,jdbcType=BIGINT},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DOUBLE},
+      </if>
+      <if test="standard != null">
+        #{standard,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null">
+        #{supplierId,jdbcType=BIGINT},
+      </if>
+      <if test="safetyStock != null">
+        #{safetyStock,jdbcType=DOUBLE},
+      </if>
+      <if test="lastMonthQuantity != null">
+        #{lastMonthQuantity,jdbcType=DOUBLE},
+      </if>
+      <if test="onHandInventory != null">
+        #{onHandInventory,jdbcType=DOUBLE},
+      </if>
+      <if test="reportedQuantity != null">
+        #{reportedQuantity,jdbcType=DOUBLE},
+      </if>
+      <if test="sort != null">
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="isDelete != null">
+        #{isDelete,jdbcType=INTEGER},
+      </if>
+      <if test="recordTime != null">
+        #{recordTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="recordOn != null">
+        #{recordOn,jdbcType=BIGINT},
+      </if>
+      <if test="purchaseMethod != null">
+        #{purchaseMethod,jdbcType=BIGINT},
+      </if>
+      <if test="prodLineMembers != null">
+        #{prodLineMembers,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="note != null">
+        #{note,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.caler.zkl.openpsd.bean.ApplicationProductExample" resultType="java.lang.Long">
+    select count(*) from application_product
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update application_product
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.productId != null">
+        product_id = #{record.productId,jdbcType=BIGINT},
+      </if>
+      <if test="record.productCode != null">
+        product_code = #{record.productCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.type1 != null">
+        type_1 = #{record.type1,jdbcType=BIGINT},
+      </if>
+      <if test="record.type2 != null">
+        type_2 = #{record.type2,jdbcType=BIGINT},
+      </if>
+      <if test="record.productName != null">
+        product_name = #{record.productName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mainid != null">
+        mainid = #{record.mainid,jdbcType=BIGINT},
+      </if>
+      <if test="record.specifications != null">
+        specifications = #{record.specifications,jdbcType=VARCHAR},
+      </if>
+      <if test="record.unit != null">
+        unit = #{record.unit,jdbcType=BIGINT},
+      </if>
+      <if test="record.price != null">
+        price = #{record.price,jdbcType=DOUBLE},
+      </if>
+      <if test="record.standard != null">
+        standard = #{record.standard,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supplierId != null">
+        supplier_id = #{record.supplierId,jdbcType=BIGINT},
+      </if>
+      <if test="record.safetyStock != null">
+        safety_stock = #{record.safetyStock,jdbcType=DOUBLE},
+      </if>
+      <if test="record.lastMonthQuantity != null">
+        last_month_quantity = #{record.lastMonthQuantity,jdbcType=DOUBLE},
+      </if>
+      <if test="record.onHandInventory != null">
+        on_hand_inventory = #{record.onHandInventory,jdbcType=DOUBLE},
+      </if>
+      <if test="record.reportedQuantity != null">
+        reported_quantity = #{record.reportedQuantity,jdbcType=DOUBLE},
+      </if>
+      <if test="record.sort != null">
+        sort = #{record.sort,jdbcType=INTEGER},
+      </if>
+      <if test="record.status != null">
+        status = #{record.status,jdbcType=INTEGER},
+      </if>
+      <if test="record.isDelete != null">
+        is_delete = #{record.isDelete,jdbcType=INTEGER},
+      </if>
+      <if test="record.recordTime != null">
+        record_time = #{record.recordTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.recordOn != null">
+        record_on = #{record.recordOn,jdbcType=BIGINT},
+      </if>
+      <if test="record.purchaseMethod != null">
+        purchase_method = #{record.purchaseMethod,jdbcType=BIGINT},
+      </if>
+      <if test="record.prodLineMembers != null">
+        prod_line_members = #{record.prodLineMembers,jdbcType=INTEGER},
+      </if>
+      <if test="record.description != null">
+        description = #{record.description,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.note != null">
+        note = #{record.note,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update application_product
+    set id = #{record.id,jdbcType=BIGINT},
+      product_id = #{record.productId,jdbcType=BIGINT},
+      product_code = #{record.productCode,jdbcType=VARCHAR},
+      type_1 = #{record.type1,jdbcType=BIGINT},
+      type_2 = #{record.type2,jdbcType=BIGINT},
+      product_name = #{record.productName,jdbcType=VARCHAR},
+      mainid = #{record.mainid,jdbcType=BIGINT},
+      specifications = #{record.specifications,jdbcType=VARCHAR},
+      unit = #{record.unit,jdbcType=BIGINT},
+      price = #{record.price,jdbcType=DOUBLE},
+      standard = #{record.standard,jdbcType=VARCHAR},
+      supplier_id = #{record.supplierId,jdbcType=BIGINT},
+      safety_stock = #{record.safetyStock,jdbcType=DOUBLE},
+      last_month_quantity = #{record.lastMonthQuantity,jdbcType=DOUBLE},
+      on_hand_inventory = #{record.onHandInventory,jdbcType=DOUBLE},
+      reported_quantity = #{record.reportedQuantity,jdbcType=DOUBLE},
+      sort = #{record.sort,jdbcType=INTEGER},
+      status = #{record.status,jdbcType=INTEGER},
+      is_delete = #{record.isDelete,jdbcType=INTEGER},
+      record_time = #{record.recordTime,jdbcType=TIMESTAMP},
+      record_on = #{record.recordOn,jdbcType=BIGINT},
+      purchase_method = #{record.purchaseMethod,jdbcType=BIGINT},
+      prod_line_members = #{record.prodLineMembers,jdbcType=INTEGER},
+      description = #{record.description,jdbcType=LONGVARCHAR},
+      note = #{record.note,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update application_product
+    set id = #{record.id,jdbcType=BIGINT},
+      product_id = #{record.productId,jdbcType=BIGINT},
+      product_code = #{record.productCode,jdbcType=VARCHAR},
+      type_1 = #{record.type1,jdbcType=BIGINT},
+      type_2 = #{record.type2,jdbcType=BIGINT},
+      product_name = #{record.productName,jdbcType=VARCHAR},
+      mainid = #{record.mainid,jdbcType=BIGINT},
+      specifications = #{record.specifications,jdbcType=VARCHAR},
+      unit = #{record.unit,jdbcType=BIGINT},
+      price = #{record.price,jdbcType=DOUBLE},
+      standard = #{record.standard,jdbcType=VARCHAR},
+      supplier_id = #{record.supplierId,jdbcType=BIGINT},
+      safety_stock = #{record.safetyStock,jdbcType=DOUBLE},
+      last_month_quantity = #{record.lastMonthQuantity,jdbcType=DOUBLE},
+      on_hand_inventory = #{record.onHandInventory,jdbcType=DOUBLE},
+      reported_quantity = #{record.reportedQuantity,jdbcType=DOUBLE},
+      sort = #{record.sort,jdbcType=INTEGER},
+      status = #{record.status,jdbcType=INTEGER},
+      is_delete = #{record.isDelete,jdbcType=INTEGER},
+      record_time = #{record.recordTime,jdbcType=TIMESTAMP},
+      record_on = #{record.recordOn,jdbcType=BIGINT},
+      purchase_method = #{record.purchaseMethod,jdbcType=BIGINT},
+      prod_line_members = #{record.prodLineMembers,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.caler.zkl.openpsd.bean.ApplicationProduct">
+    update application_product
+    <set>
+      <if test="productId != null">
+        product_id = #{productId,jdbcType=BIGINT},
+      </if>
+      <if test="productCode != null">
+        product_code = #{productCode,jdbcType=VARCHAR},
+      </if>
+      <if test="type1 != null">
+        type_1 = #{type1,jdbcType=BIGINT},
+      </if>
+      <if test="type2 != null">
+        type_2 = #{type2,jdbcType=BIGINT},
+      </if>
+      <if test="productName != null">
+        product_name = #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="mainid != null">
+        mainid = #{mainid,jdbcType=BIGINT},
+      </if>
+      <if test="specifications != null">
+        specifications = #{specifications,jdbcType=VARCHAR},
+      </if>
+      <if test="unit != null">
+        unit = #{unit,jdbcType=BIGINT},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=DOUBLE},
+      </if>
+      <if test="standard != null">
+        standard = #{standard,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null">
+        supplier_id = #{supplierId,jdbcType=BIGINT},
+      </if>
+      <if test="safetyStock != null">
+        safety_stock = #{safetyStock,jdbcType=DOUBLE},
+      </if>
+      <if test="lastMonthQuantity != null">
+        last_month_quantity = #{lastMonthQuantity,jdbcType=DOUBLE},
+      </if>
+      <if test="onHandInventory != null">
+        on_hand_inventory = #{onHandInventory,jdbcType=DOUBLE},
+      </if>
+      <if test="reportedQuantity != null">
+        reported_quantity = #{reportedQuantity,jdbcType=DOUBLE},
+      </if>
+      <if test="sort != null">
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="isDelete != null">
+        is_delete = #{isDelete,jdbcType=INTEGER},
+      </if>
+      <if test="recordTime != null">
+        record_time = #{recordTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="recordOn != null">
+        record_on = #{recordOn,jdbcType=BIGINT},
+      </if>
+      <if test="purchaseMethod != null">
+        purchase_method = #{purchaseMethod,jdbcType=BIGINT},
+      </if>
+      <if test="prodLineMembers != null">
+        prod_line_members = #{prodLineMembers,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="note != null">
+        note = #{note,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.caler.zkl.openpsd.bean.ApplicationProduct">
+    update application_product
+    set product_id = #{productId,jdbcType=BIGINT},
+      product_code = #{productCode,jdbcType=VARCHAR},
+      type_1 = #{type1,jdbcType=BIGINT},
+      type_2 = #{type2,jdbcType=BIGINT},
+      product_name = #{productName,jdbcType=VARCHAR},
+      mainid = #{mainid,jdbcType=BIGINT},
+      specifications = #{specifications,jdbcType=VARCHAR},
+      unit = #{unit,jdbcType=BIGINT},
+      price = #{price,jdbcType=DOUBLE},
+      standard = #{standard,jdbcType=VARCHAR},
+      supplier_id = #{supplierId,jdbcType=BIGINT},
+      safety_stock = #{safetyStock,jdbcType=DOUBLE},
+      last_month_quantity = #{lastMonthQuantity,jdbcType=DOUBLE},
+      on_hand_inventory = #{onHandInventory,jdbcType=DOUBLE},
+      reported_quantity = #{reportedQuantity,jdbcType=DOUBLE},
+      sort = #{sort,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      is_delete = #{isDelete,jdbcType=INTEGER},
+      record_time = #{recordTime,jdbcType=TIMESTAMP},
+      record_on = #{recordOn,jdbcType=BIGINT},
+      purchase_method = #{purchaseMethod,jdbcType=BIGINT},
+      prod_line_members = #{prodLineMembers,jdbcType=INTEGER},
+      description = #{description,jdbcType=LONGVARCHAR},
+      note = #{note,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.caler.zkl.openpsd.bean.ApplicationProduct">
+    update application_product
+    set product_id = #{productId,jdbcType=BIGINT},
+      product_code = #{productCode,jdbcType=VARCHAR},
+      type_1 = #{type1,jdbcType=BIGINT},
+      type_2 = #{type2,jdbcType=BIGINT},
+      product_name = #{productName,jdbcType=VARCHAR},
+      mainid = #{mainid,jdbcType=BIGINT},
+      specifications = #{specifications,jdbcType=VARCHAR},
+      unit = #{unit,jdbcType=BIGINT},
+      price = #{price,jdbcType=DOUBLE},
+      standard = #{standard,jdbcType=VARCHAR},
+      supplier_id = #{supplierId,jdbcType=BIGINT},
+      safety_stock = #{safetyStock,jdbcType=DOUBLE},
+      last_month_quantity = #{lastMonthQuantity,jdbcType=DOUBLE},
+      on_hand_inventory = #{onHandInventory,jdbcType=DOUBLE},
+      reported_quantity = #{reportedQuantity,jdbcType=DOUBLE},
+      sort = #{sort,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      is_delete = #{isDelete,jdbcType=INTEGER},
+      record_time = #{recordTime,jdbcType=TIMESTAMP},
+      record_on = #{recordOn,jdbcType=BIGINT},
+      purchase_method = #{purchaseMethod,jdbcType=BIGINT},
+      prod_line_members = #{prodLineMembers,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

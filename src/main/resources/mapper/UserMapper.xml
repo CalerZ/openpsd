@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caler.zkl.openpsd.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.caler.zkl.openpsd.bean.User">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="member_level_id" jdbcType="BIGINT" property="memberLevelId" />
+        <result column="username" jdbcType="VARCHAR" property="username" />
+        <result column="password" jdbcType="VARCHAR" property="password" />
+        <result column="nickname" jdbcType="VARCHAR" property="nickname" />
+        <result column="phone" jdbcType="VARCHAR" property="phone" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="gender" jdbcType="INTEGER" property="gender" />
+        <result column="birthday" jdbcType="DATE" property="birthday" />
+        <result column="city" jdbcType="VARCHAR" property="city" />
+        <result column="job" jdbcType="VARCHAR" property="job" />
+        <result column="company_id" jdbcType="BIGINT" property="companyId" />
+        <result column="email" jdbcType="VARCHAR" property="email" />
+        <result column="last_login_time" jdbcType="TIMESTAMP" property="lastLoginTime" />
+<!--        分步加载1.根据人员id查询公司-->
+        <association property="company" javaType="com.caler.zkl.openpsd.bean.Company" column="company_id"
+                     select="com.caler.zkl.openpsd.mapper.CompanyMapper.selectByPrimaryKey" ></association>
+        <collection property="roles" javaType="java.util.ArrayList" ofType="com.caler.zkl.openpsd.bean.Role"
+                    column="id" select="com.caler.zkl.openpsd.mapper.MemberDao.selectRoleByMemberId"></collection>
+        <collection property="menues" javaType="java.util.ArrayList"  ofType="com.caler.zkl.openpsd.bean.Menu"
+                    column="id" select="com.caler.zkl.openpsd.mapper.MemberDao.selectMenuByMemberId"></collection>
+        <collection property="permissions" javaType="java.util.ArrayList"  ofType="com.caler.zkl.openpsd.bean.Permission"
+                    column="id" select="com.caler.zkl.openpsd.mapper.MemberDao.selectPermissionByMemberId"></collection>
+        <collection property="resources" javaType="java.util.ArrayList"  ofType="com.caler.zkl.openpsd.bean.Resource"
+                    column="id" select="com.caler.zkl.openpsd.mapper.MemberDao.selectResourceByMemberId"></collection>
+    </resultMap>
+
+
+    <select id="selectByName" resultMap="BaseResultMap">
+        SELECT * FROM member WHERE username = #{username} AND STATUS=1
+    </select>
+
+
+</mapper>

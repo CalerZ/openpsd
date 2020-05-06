@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caler.zkl.openpsd.mapper.ApplicationFormMapper">
+  <resultMap id="BaseResultMap" type="com.caler.zkl.openpsd.bean.ApplicationForm">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="form_code" jdbcType="VARCHAR" property="formCode" />
+    <result column="apply_company" jdbcType="BIGINT" property="applyCompany" />
+    <result column="apply_status" jdbcType="INTEGER" property="applyStatus" />
+    <result column="apply_on" jdbcType="BIGINT" property="applyOn" />
+    <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime" />
+    <result column="approver" jdbcType="BIGINT" property="approver" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="modify_on" jdbcType="BIGINT" property="modifyOn" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.caler.zkl.openpsd.bean.ApplicationForm">
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, form_code, apply_company, apply_status, apply_on, apply_time, approver, modify_time, 
+    modify_on, is_delete
+  </sql>
+  <sql id="Blob_Column_List">
+    description
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.caler.zkl.openpsd.bean.ApplicationFormExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from application_form
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.caler.zkl.openpsd.bean.ApplicationFormExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from application_form
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from application_form
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from application_form
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.caler.zkl.openpsd.bean.ApplicationFormExample">
+    delete from application_form
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.caler.zkl.openpsd.bean.ApplicationForm">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into application_form (form_code, apply_company, apply_status, 
+      apply_on, apply_time, approver, 
+      modify_time, modify_on, is_delete, 
+      description)
+    values (#{formCode,jdbcType=VARCHAR}, #{applyCompany,jdbcType=BIGINT}, #{applyStatus,jdbcType=INTEGER}, 
+      #{applyOn,jdbcType=BIGINT}, #{applyTime,jdbcType=TIMESTAMP}, #{approver,jdbcType=BIGINT}, 
+      #{modifyTime,jdbcType=TIMESTAMP}, #{modifyOn,jdbcType=BIGINT}, #{isDelete,jdbcType=INTEGER}, 
+      #{description,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.caler.zkl.openpsd.bean.ApplicationForm">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into application_form
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="formCode != null">
+        form_code,
+      </if>
+      <if test="applyCompany != null">
+        apply_company,
+      </if>
+      <if test="applyStatus != null">
+        apply_status,
+      </if>
+      <if test="applyOn != null">
+        apply_on,
+      </if>
+      <if test="applyTime != null">
+        apply_time,
+      </if>
+      <if test="approver != null">
+        approver,
+      </if>
+      <if test="modifyTime != null">
+        modify_time,
+      </if>
+      <if test="modifyOn != null">
+        modify_on,
+      </if>
+      <if test="isDelete != null">
+        is_delete,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="formCode != null">
+        #{formCode,jdbcType=VARCHAR},
+      </if>
+      <if test="applyCompany != null">
+        #{applyCompany,jdbcType=BIGINT},
+      </if>
+      <if test="applyStatus != null">
+        #{applyStatus,jdbcType=INTEGER},
+      </if>
+      <if test="applyOn != null">
+        #{applyOn,jdbcType=BIGINT},
+      </if>
+      <if test="applyTime != null">
+        #{applyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="approver != null">
+        #{approver,jdbcType=BIGINT},
+      </if>
+      <if test="modifyTime != null">
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyOn != null">
+        #{modifyOn,jdbcType=BIGINT},
+      </if>
+      <if test="isDelete != null">
+        #{isDelete,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.caler.zkl.openpsd.bean.ApplicationFormExample" resultType="java.lang.Long">
+    select count(*) from application_form
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update application_form
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.formCode != null">
+        form_code = #{record.formCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyCompany != null">
+        apply_company = #{record.applyCompany,jdbcType=BIGINT},
+      </if>
+      <if test="record.applyStatus != null">
+        apply_status = #{record.applyStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.applyOn != null">
+        apply_on = #{record.applyOn,jdbcType=BIGINT},
+      </if>
+      <if test="record.applyTime != null">
+        apply_time = #{record.applyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.approver != null">
+        approver = #{record.approver,jdbcType=BIGINT},
+      </if>
+      <if test="record.modifyTime != null">
+        modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.modifyOn != null">
+        modify_on = #{record.modifyOn,jdbcType=BIGINT},
+      </if>
+      <if test="record.isDelete != null">
+        is_delete = #{record.isDelete,jdbcType=INTEGER},
+      </if>
+      <if test="record.description != null">
+        description = #{record.description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update application_form
+    set id = #{record.id,jdbcType=BIGINT},
+      form_code = #{record.formCode,jdbcType=VARCHAR},
+      apply_company = #{record.applyCompany,jdbcType=BIGINT},
+      apply_status = #{record.applyStatus,jdbcType=INTEGER},
+      apply_on = #{record.applyOn,jdbcType=BIGINT},
+      apply_time = #{record.applyTime,jdbcType=TIMESTAMP},
+      approver = #{record.approver,jdbcType=BIGINT},
+      modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+      modify_on = #{record.modifyOn,jdbcType=BIGINT},
+      is_delete = #{record.isDelete,jdbcType=INTEGER},
+      description = #{record.description,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update application_form
+    set id = #{record.id,jdbcType=BIGINT},
+      form_code = #{record.formCode,jdbcType=VARCHAR},
+      apply_company = #{record.applyCompany,jdbcType=BIGINT},
+      apply_status = #{record.applyStatus,jdbcType=INTEGER},
+      apply_on = #{record.applyOn,jdbcType=BIGINT},
+      apply_time = #{record.applyTime,jdbcType=TIMESTAMP},
+      approver = #{record.approver,jdbcType=BIGINT},
+      modify_time = #{record.modifyTime,jdbcType=TIMESTAMP},
+      modify_on = #{record.modifyOn,jdbcType=BIGINT},
+      is_delete = #{record.isDelete,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.caler.zkl.openpsd.bean.ApplicationForm">
+    update application_form
+    <set>
+      <if test="formCode != null">
+        form_code = #{formCode,jdbcType=VARCHAR},
+      </if>
+      <if test="applyCompany != null">
+        apply_company = #{applyCompany,jdbcType=BIGINT},
+      </if>
+      <if test="applyStatus != null">
+        apply_status = #{applyStatus,jdbcType=INTEGER},
+      </if>
+      <if test="applyOn != null">
+        apply_on = #{applyOn,jdbcType=BIGINT},
+      </if>
+      <if test="applyTime != null">
+        apply_time = #{applyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="approver != null">
+        approver = #{approver,jdbcType=BIGINT},
+      </if>
+      <if test="modifyTime != null">
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyOn != null">
+        modify_on = #{modifyOn,jdbcType=BIGINT},
+      </if>
+      <if test="isDelete != null">
+        is_delete = #{isDelete,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.caler.zkl.openpsd.bean.ApplicationForm">
+    update application_form
+    set form_code = #{formCode,jdbcType=VARCHAR},
+      apply_company = #{applyCompany,jdbcType=BIGINT},
+      apply_status = #{applyStatus,jdbcType=INTEGER},
+      apply_on = #{applyOn,jdbcType=BIGINT},
+      apply_time = #{applyTime,jdbcType=TIMESTAMP},
+      approver = #{approver,jdbcType=BIGINT},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      modify_on = #{modifyOn,jdbcType=BIGINT},
+      is_delete = #{isDelete,jdbcType=INTEGER},
+      description = #{description,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.caler.zkl.openpsd.bean.ApplicationForm">
+    update application_form
+    set form_code = #{formCode,jdbcType=VARCHAR},
+      apply_company = #{applyCompany,jdbcType=BIGINT},
+      apply_status = #{applyStatus,jdbcType=INTEGER},
+      apply_on = #{applyOn,jdbcType=BIGINT},
+      apply_time = #{applyTime,jdbcType=TIMESTAMP},
+      approver = #{approver,jdbcType=BIGINT},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      modify_on = #{modifyOn,jdbcType=BIGINT},
+      is_delete = #{isDelete,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

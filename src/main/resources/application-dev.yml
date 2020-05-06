@@ -1,0 +1,37 @@
+server:
+  port: 8088
+
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/psd?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    druid:
+      initial-size: 5 #连接池初始化大小
+      min-idle: 10 #最小空闲连接数
+      max-active: 20 #最大连接数
+      web-stat-filter:
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*" #不统计这些请求数据
+      stat-view-servlet: #访问监控网页的登录用户名和密码
+        login-username: druid
+        login-password: druid
+#  # 配置SBA Client连接的安全账号密码
+  security:
+    user:
+      name: admin
+      password: admin
+  boot:
+    admin:
+      client:
+        # 这个URL地址是SBA Server的服务地址，你需要将你的应用注册到该地址上
+        url: http://127.0.0.1:8090
+        # 配置连接到监测管理平台的Security安全密码
+        username: admin
+        password: admin
+        instance:
+          metadata:
+            # 配置发送到SBA Server的SBA Client的端点安全密码
+            user.name: ${spring.security.user.name}
+            user.password: ${spring.security.user.password}
+        enabled: false
+
