@@ -2,23 +2,23 @@ package com.caler.zkl.openpsd.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import com.caler.zkl.openpsd.common.CommonResult;
 import com.caler.zkl.openpsd.common.ProductExcelData;
 import com.caler.zkl.openpsd.util.ExcelUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 
 
 @Controller
-@RequestMapping("/api")
+@RequestMapping("/info")
 public class ExcelOperationController {
     private static final Logger log = LogManager.getLogger(ExcelOperationController.class);
 
@@ -27,8 +27,9 @@ public class ExcelOperationController {
      * @param response
      * @throws IOException
      */
-    @RequestMapping(value = "/exportExcel", method = RequestMethod.GET)
-    public void exportExcel(HttpServletResponse response)  throws IOException {
+    @PostMapping("/exportExcel")
+    public CommonResult exportExcel(@RequestBody List<Long> ids, HttpServletResponse response)  throws IOException {
+        System.out.println(ids);
         List<ProductExcelData> resultList = new ArrayList<ProductExcelData>();
         for (int i = 0; i < 100; i++) {
             ProductExcelData productExcelData = new ProductExcelData();
@@ -52,6 +53,7 @@ public class ExcelOperationController {
         ExcelUtil.writeExcel(response, resultList, ProductExcelData.class);
         long t2 = System.currentTimeMillis();
         System.out.println(String.format("write over! cost:%sms", (t2 - t1)));
+        return CommonResult.success(null);
     }
 
     /**
@@ -64,8 +66,5 @@ public class ExcelOperationController {
         List<ProductExcelData> list = ExcelUtil.readExcel("", ProductExcelData.class, file);
         long t2 = System.currentTimeMillis();
         System.out.println(String.format("read over! cost:%sms", (t2 - t1)));
-//        list.forEach(
-//                b -> System.out.println(JSON.toJSONString(b))
-//        );
     }
 }

@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caler.zkl.openpsd.mapper.SysDictMapper">
+  <resultMap id="BaseResultMap" type="com.caler.zkl.openpsd.bean.SysDict">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="pid" jdbcType="INTEGER" property="pid" />
+    <result column="data_type" jdbcType="VARCHAR" property="dataType" />
+    <result column="data_code" jdbcType="VARCHAR" property="dataCode" />
+    <result column="data_value" jdbcType="VARCHAR" property="dataValue" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="is_fixed" jdbcType="TINYINT" property="isFixed" />
+    <result column="data_desc" jdbcType="VARCHAR" property="dataDesc" />
+    <result column="update_ime" jdbcType="TIMESTAMP" property="updateIme" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, pid, data_type, data_code, data_value, sort, status, is_fixed, data_desc, update_ime
+  </sql>
+  <select id="selectByExample" parameterType="com.caler.zkl.openpsd.bean.SysDictExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from sys_dict
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_dict
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from sys_dict
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.caler.zkl.openpsd.bean.SysDictExample">
+    delete from sys_dict
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.caler.zkl.openpsd.bean.SysDict">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into sys_dict (pid, data_type, data_code, 
+      data_value, sort, status, 
+      is_fixed, data_desc, update_ime
+      )
+    values (#{pid,jdbcType=INTEGER}, #{dataType,jdbcType=VARCHAR}, #{dataCode,jdbcType=VARCHAR}, 
+      #{dataValue,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}, #{status,jdbcType=TINYINT}, 
+      #{isFixed,jdbcType=TINYINT}, #{dataDesc,jdbcType=VARCHAR}, #{updateIme,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.caler.zkl.openpsd.bean.SysDict">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into sys_dict
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="pid != null">
+        pid,
+      </if>
+      <if test="dataType != null">
+        data_type,
+      </if>
+      <if test="dataCode != null">
+        data_code,
+      </if>
+      <if test="dataValue != null">
+        data_value,
+      </if>
+      <if test="sort != null">
+        sort,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="isFixed != null">
+        is_fixed,
+      </if>
+      <if test="dataDesc != null">
+        data_desc,
+      </if>
+      <if test="updateIme != null">
+        update_ime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="pid != null">
+        #{pid,jdbcType=INTEGER},
+      </if>
+      <if test="dataType != null">
+        #{dataType,jdbcType=VARCHAR},
+      </if>
+      <if test="dataCode != null">
+        #{dataCode,jdbcType=VARCHAR},
+      </if>
+      <if test="dataValue != null">
+        #{dataValue,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null">
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="isFixed != null">
+        #{isFixed,jdbcType=TINYINT},
+      </if>
+      <if test="dataDesc != null">
+        #{dataDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="updateIme != null">
+        #{updateIme,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.caler.zkl.openpsd.bean.SysDictExample" resultType="java.lang.Long">
+    select count(*) from sys_dict
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update sys_dict
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.pid != null">
+        pid = #{record.pid,jdbcType=INTEGER},
+      </if>
+      <if test="record.dataType != null">
+        data_type = #{record.dataType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.dataCode != null">
+        data_code = #{record.dataCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.dataValue != null">
+        data_value = #{record.dataValue,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sort != null">
+        sort = #{record.sort,jdbcType=INTEGER},
+      </if>
+      <if test="record.status != null">
+        status = #{record.status,jdbcType=TINYINT},
+      </if>
+      <if test="record.isFixed != null">
+        is_fixed = #{record.isFixed,jdbcType=TINYINT},
+      </if>
+      <if test="record.dataDesc != null">
+        data_desc = #{record.dataDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.updateIme != null">
+        update_ime = #{record.updateIme,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update sys_dict
+    set id = #{record.id,jdbcType=BIGINT},
+      pid = #{record.pid,jdbcType=INTEGER},
+      data_type = #{record.dataType,jdbcType=VARCHAR},
+      data_code = #{record.dataCode,jdbcType=VARCHAR},
+      data_value = #{record.dataValue,jdbcType=VARCHAR},
+      sort = #{record.sort,jdbcType=INTEGER},
+      status = #{record.status,jdbcType=TINYINT},
+      is_fixed = #{record.isFixed,jdbcType=TINYINT},
+      data_desc = #{record.dataDesc,jdbcType=VARCHAR},
+      update_ime = #{record.updateIme,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.caler.zkl.openpsd.bean.SysDict">
+    update sys_dict
+    <set>
+      <if test="pid != null">
+        pid = #{pid,jdbcType=INTEGER},
+      </if>
+      <if test="dataType != null">
+        data_type = #{dataType,jdbcType=VARCHAR},
+      </if>
+      <if test="dataCode != null">
+        data_code = #{dataCode,jdbcType=VARCHAR},
+      </if>
+      <if test="dataValue != null">
+        data_value = #{dataValue,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null">
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="isFixed != null">
+        is_fixed = #{isFixed,jdbcType=TINYINT},
+      </if>
+      <if test="dataDesc != null">
+        data_desc = #{dataDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="updateIme != null">
+        update_ime = #{updateIme,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.caler.zkl.openpsd.bean.SysDict">
+    update sys_dict
+    set pid = #{pid,jdbcType=INTEGER},
+      data_type = #{dataType,jdbcType=VARCHAR},
+      data_code = #{dataCode,jdbcType=VARCHAR},
+      data_value = #{dataValue,jdbcType=VARCHAR},
+      sort = #{sort,jdbcType=INTEGER},
+      status = #{status,jdbcType=TINYINT},
+      is_fixed = #{isFixed,jdbcType=TINYINT},
+      data_desc = #{dataDesc,jdbcType=VARCHAR},
+      update_ime = #{updateIme,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

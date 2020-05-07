@@ -12,5 +12,5 @@ import java.util.List;
 @Data
 public class Application {
     private ApplicationForm applicationForm;
-    private List<ApplicationProduct> applicationProducts;
+    private List<ApplicationProduct > applicationProducts;
 }

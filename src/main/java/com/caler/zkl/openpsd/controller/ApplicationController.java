@@ -128,4 +128,15 @@ public class ApplicationController {
 
     }
 
+    /**
+     * 生成申请单单号
+     */
+    @PostMapping("/applyFormNo")
+    @ApiOperation("生成申请单单号")
+    public CommonResult getFormNo(){
+        String formNo = applicationService.generateFormNo();
+        return CommonResult.success(formNo);
+
+    }
+
 }

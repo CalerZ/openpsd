@@ -91,10 +91,13 @@ public class ProductController {
      */
     @PostMapping("/list")
     @ApiOperation("查询条件查询物品")
-    public CommonResult list(@RequestBody(required = false) Product member,
+    public CommonResult list(@RequestParam(value = "keyword",required = false) String keyword,
+                             @RequestParam(value = "typeid",required = false) Long typeid,
+                             @RequestParam(value = "status",required = false) Integer status,
+                             @RequestParam(value = "createrid",required = false) Long createrid,
                              @RequestParam(value = "pageSize",required = true,defaultValue = "10") Integer pageSize,
                              @RequestParam(value = "pageNum",required = true,defaultValue = "1") Integer pageNum){
-        List<Product> memberList = memberService.list(member, pageSize, pageNum);
+        List<Product> memberList = memberService.list(keyword,typeid,status,createrid, pageSize, pageNum);
         return CommonResult.success(CommonPage.restPage(memberList));
 
     }

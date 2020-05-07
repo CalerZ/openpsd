@@ -42,7 +42,7 @@ public interface ProductService {
     /**
      * 条件分页查询
      */
-    List<Product> list(Product member, Integer pageSize, Integer pageNum);
+    List<Product> list(String keyword, Long typeid, Integer status, Long createrid, Integer pageSize, Integer pageNum);
 
 
     int delete(Long id);

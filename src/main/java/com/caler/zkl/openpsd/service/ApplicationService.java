@@ -47,4 +47,6 @@ public interface ApplicationService {
     List<Application> reviewedApplicationList(String keyword, Integer pageSize, Integer pageNum);
 
     int submit(Application application);
+
+    String generateFormNo();
 }

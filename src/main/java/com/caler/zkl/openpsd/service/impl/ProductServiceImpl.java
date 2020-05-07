@@ -12,6 +12,7 @@ import com.caler.zkl.openpsd.service.MemberService;
 import com.caler.zkl.openpsd.service.ProductService;
 import com.caler.zkl.openpsd.service.StockService;
 import com.caler.zkl.openpsd.service.UserService;
+import com.caler.zkl.openpsd.util.UserServiceUtil;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,13 +36,11 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductMapper productMapper;
     @Autowired
-    private UserService userService;
-    @Autowired
-    private MemberService memberService;
-    @Autowired
     private StockMapper stockMapper;
     @Autowired
     private PurchaseMethodMapper purchaseMethodMapper;
+    @Autowired
+    private UserServiceUtil userServiceUtil;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -49,16 +48,13 @@ public class ProductServiceImpl implements ProductService {
         int count = 0;
         Product product = productDetail.getProduct();
         product.setCreateTime(DateTime.now().toStringDefaultTimeZone());
-        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        if (StrUtil.isEmpty(username)) {
-            throw new BizException("用户未登录或用户名不存在！");
-        }
-        product.setCreateOn(memberService.selectByName(username).getId());
+        product.setCreateOn(userServiceUtil.getUser().getId());
+        product.setIsDelete(0);
         count += productMapper.insertSelective(product);
         Stock stock = productDetail.getStock();
         stock.setProductId(product.getId());
         stock.setProductCode(product.getCode());
-        count += stockMapper.insertSelective(stock);
+        stockMapper.insertSelective(stock);
         return count;
     }
 
@@ -67,11 +63,8 @@ public class ProductServiceImpl implements ProductService {
         int count = 0;
         Product product = productDetail.getProduct();
         product.setModifyTime(DateTime.now().toStringDefaultTimeZone());
-        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        if (StrUtil.isEmpty(username)) {
-            throw new BizException("用户未登录或用户名不存在！");
-        }
-        product.setModifyOn(memberService.selectByName(username).getId());
+        product.setModifyOn(userServiceUtil.getUser().getId());
+        product.setModifyTime(DateTime.now().toStringDefaultTimeZone());
         count += productMapper.updateByPrimaryKeySelective(product);
         Stock stock = productDetail.getStock();
         count += stockMapper.updateByPrimaryKeySelective(stock);
@@ -82,22 +75,20 @@ public class ProductServiceImpl implements ProductService {
     public int delete(List<Long> ids) {
         int count = 0;
         for (long id : ids) {
-            count += productMapper.deleteByPrimaryKey(id);
-            StockExample example = new StockExample();
-            example.createCriteria().andProductIdEqualTo(id);
-            stockMapper.deleteByExample(example);
+            Product product = new Product();
+            product.setId(id);
+            product.setIsDelete(1);
+            count+=productMapper.updateByPrimaryKeySelective(product);
         }
         return count;
     }
 
     @Override
     public int delete(Long id) {
-        int count = 0;
-        count += productMapper.deleteByPrimaryKey(id);
-        StockExample example = new StockExample();
-        example.createCriteria().andProductIdEqualTo(id);
-        stockMapper.deleteByExample(example);
-        return count;
+        Product product = new Product();
+        product.setId(id);
+        product.setIsDelete(1);
+        return productMapper.updateByPrimaryKeySelective(product);
     }
 
     @Override
@@ -151,20 +142,37 @@ public class ProductServiceImpl implements ProductService {
         example.createCriteria().andProductIdEqualTo(id);
         List<Stock> stocks = stockMapper.selectByExample(example);
         productDetail.setStock(stocks.get(0));
-
         return productDetail;
     }
 
     @Override
     public List<Product> list() {
+        ProductExample example = new ProductExample();
+        example.createCriteria().andIsDeleteEqualTo(0);
         return productMapper.selectByExample(null);
     }
 
     @Override
-    public List<Product> list(Product product, Integer pageSize, Integer pageNum) {
+    public List<Product> list(String keyword, Long typeid, Integer status, Long createrid, Integer pageSize, Integer pageNum) {
         PageHelper.startPage(pageNum, pageSize);
         ProductExample example = new ProductExample();
-        //设置条件
+        ProductExample.Criteria criteria = example.createCriteria();
+        criteria.andIsDeleteEqualTo(0);
+        if(keyword!=null){
+            criteria.andNameLike("%"+keyword+"%");
+            example.or(example.createCriteria().andCodeLike("%"+keyword+"%"));
+        }
+        if(status!=null){
+            criteria.andStatusEqualTo(status);
+        }
+        if(typeid!=null){
+            criteria.andType1EqualTo(typeid);
+            example.or(example.createCriteria().andType2EqualTo(typeid));
+        }
+        if(createrid!=null){
+            criteria.andCreateOnEqualTo(createrid);
+        }
+        example.setOrderByClause("modify_time desc,create_time desc");
         return productMapper.selectByExample(example);
     }
 }
