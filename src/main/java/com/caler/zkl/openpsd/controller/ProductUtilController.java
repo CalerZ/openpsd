@@ -30,7 +30,7 @@ public class ProductUtilController {
     @PostMapping("/insert")
     @ApiOperation("添加物品单位")
     public CommonResult create(@RequestBody ProductUtil member) {
-        return CommonResult.success(memberService.create(member) == 1 ? true : false);
+        return CommonResult.success(memberService.create(member) >0 ? true : false);
     }
 
     /**
@@ -39,7 +39,7 @@ public class ProductUtilController {
     @PostMapping("/update")
     @ApiOperation("修改物品单位")
     public CommonResult update(@RequestBody ProductUtil member) {
-        return CommonResult.success(memberService.update(member) == 1 ? true : false);
+        return CommonResult.success(memberService.update(member) >0 ? true : false);
     }
 
     /**

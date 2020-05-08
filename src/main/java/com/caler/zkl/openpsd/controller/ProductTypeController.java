@@ -32,7 +32,7 @@ public class ProductTypeController {
     @PostMapping("/insert")
     @ApiOperation("添加物品类型")
     public CommonResult create(@RequestBody ProductType productType) {
-        return CommonResult.success(productTypeService.create(productType) == 1 ? true : false);
+        return CommonResult.success(productTypeService.create(productType) >0 ? true : false);
     }
 
     /**
@@ -41,7 +41,7 @@ public class ProductTypeController {
     @PostMapping("/update")
     @ApiOperation("修改物品类型")
     public CommonResult update(@RequestBody ProductType productType) {
-        return CommonResult.success(productTypeService.update(productType) == 1 ? true : false);
+        return CommonResult.success(productTypeService.update(productType) > 0? true : false);
     }
 
     /**

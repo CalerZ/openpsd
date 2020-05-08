@@ -5,9 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.caler.zkl.openpsd.bean.*;
 import com.caler.zkl.openpsd.exception.BizException;
-import com.caler.zkl.openpsd.mapper.ProductMapper;
-import com.caler.zkl.openpsd.mapper.PurchaseMethodMapper;
-import com.caler.zkl.openpsd.mapper.StockMapper;
+import com.caler.zkl.openpsd.mapper.*;
 import com.caler.zkl.openpsd.service.MemberService;
 import com.caler.zkl.openpsd.service.ProductService;
 import com.caler.zkl.openpsd.service.StockService;
@@ -22,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,11 +35,15 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductMapper productMapper;
     @Autowired
+    private ProductDao productDao;
+    @Autowired
     private StockMapper stockMapper;
     @Autowired
     private PurchaseMethodMapper purchaseMethodMapper;
     @Autowired
     private UserServiceUtil userServiceUtil;
+    @Autowired
+    private SysDictMapper sysDictMapper;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -78,7 +81,7 @@ public class ProductServiceImpl implements ProductService {
             Product product = new Product();
             product.setId(id);
             product.setIsDelete(1);
-            count+=productMapper.updateByPrimaryKeySelective(product);
+            count += productMapper.updateByPrimaryKeySelective(product);
         }
         return count;
     }
@@ -135,6 +138,38 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public String getProductNo() {
+        //编码规则
+        SysDictExample example = new SysDictExample();
+        example.createCriteria().andDataTypeEqualTo("3");
+        example.setOrderByClause("sort");
+        List<SysDict> dicts = sysDictMapper.selectByExample(example);
+        final  StringBuilder partNo = new StringBuilder();
+
+        dicts.forEach(item -> {
+            if("t1".equals(item.getDataCode())){//标识
+                partNo.append(item.getDataValue());
+            }
+            if("t2".equals(item.getDataCode())){
+                partNo.append("-");
+                partNo.append("095");
+            }
+            if("t3".equals(item.getDataCode())){
+                partNo.append("-");
+                partNo.append("01");
+            }
+            if("t4".equals(item.getDataCode())){
+                partNo.append("-");
+//                String  maxPartNo =  productDao.selectMaxPartNo("095","01");
+                String no = String.format("%0"+item.getDataValue()+"d", 1);
+                partNo.append(no);
+            }
+
+        });
+        return partNo.toString();
+    }
+
+    @Override
     public ProductDetail list(Long id) {
         ProductDetail productDetail = new ProductDetail();
         productDetail.setProduct(productMapper.selectByPrimaryKey(id));
@@ -152,27 +187,35 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.selectByExample(null);
     }
 
-    @Override
-    public List<Product> list(String keyword, Long typeid, Integer status, Long createrid, Integer pageSize, Integer pageNum) {
+
+    public List<Product> list1(String keyword, Long typeid, Integer status, Long createrid, Integer pageSize, Integer pageNum) {
         PageHelper.startPage(pageNum, pageSize);
+
+
         ProductExample example = new ProductExample();
         ProductExample.Criteria criteria = example.createCriteria();
         criteria.andIsDeleteEqualTo(0);
-        if(keyword!=null){
-            criteria.andNameLike("%"+keyword+"%");
-            example.or(example.createCriteria().andCodeLike("%"+keyword+"%"));
+        if (keyword != null) {
+            criteria.andNameLike("%" + keyword + "%");
+            example.or(example.createCriteria().andCodeLike("%" + keyword + "%"));
         }
-        if(status!=null){
+        if (status != null) {
             criteria.andStatusEqualTo(status);
         }
-        if(typeid!=null){
+        if (typeid != null) {
             criteria.andType1EqualTo(typeid);
             example.or(example.createCriteria().andType2EqualTo(typeid));
         }
-        if(createrid!=null){
+        if (createrid != null) {
             criteria.andCreateOnEqualTo(createrid);
         }
         example.setOrderByClause("modify_time desc,create_time desc");
         return productMapper.selectByExample(example);
+    }
+
+    @Override
+    public List<ProductBean> list(String keyword, Long typeid, Integer status, Long createrid, Integer pageSize, Integer pageNum) {
+        PageHelper.startPage(pageNum, pageSize);
+        return productDao.select(keyword, typeid, status, createrid);
     }
 }

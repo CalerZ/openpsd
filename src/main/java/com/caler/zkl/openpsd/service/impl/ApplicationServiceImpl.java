@@ -218,7 +218,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 if ("t3".equals(dataCode)) {//流水号
                     formNo.append("-");
                     SysDict sysDict = dictList.get(0);
-                    String no = String.format("%04d", Integer.parseInt(sysDict.getDataValue())+1);
+                    String no = String.format("%0"+item.getDataValue()+"d", Integer.parseInt(sysDict.getDataValue())+1);
                     formNo.append(no);
                 }
             } catch (NumberFormatException e) {

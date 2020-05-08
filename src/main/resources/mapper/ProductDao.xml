@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caler.zkl.openpsd.mapper.ProductDao">
+
+    <resultMap id="BaseResultMap" type="com.caler.zkl.openpsd.bean.ProductBean">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="type_1" jdbcType="BIGINT" property="type1"/>
+        <result column="type_2" jdbcType="BIGINT" property="type2"/>
+        <result column="specifications" jdbcType="VARCHAR" property="specifications"/>
+        <result column="unit" jdbcType="BIGINT" property="unit"/>
+        <result column="price" jdbcType="DOUBLE" property="price"/>
+        <result column="standard" jdbcType="VARCHAR" property="standard"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="create_time" jdbcType="VARCHAR" property="createTime"/>
+        <result column="create_on" jdbcType="BIGINT" property="createOn"/>
+        <result column="modify_time" jdbcType="VARCHAR" property="modifyTime"/>
+        <result column="modify_on" jdbcType="BIGINT" property="modifyOn"/>
+        <result column="supplier_id" jdbcType="VARCHAR" property="supplierId"/>
+        <result column="is_delete" jdbcType="INTEGER" property="isDelete"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="description" jdbcType="LONGVARCHAR" property="description"/>
+
+        <result column="type_1_name" property="type1Name"/>
+        <result column="type_2_name" property="type2Name"/>
+        <result column="util_name" property="utilName"/>
+        <result column="username" property="createrName"/>
+    </resultMap>
+
+
+    <select id="select" resultMap="BaseResultMap">
+        SELECT a.id , a.NAME , a.type_1 , a.type_2 , a.description , a.specifications , a.unit , a.price , a.standard , a.STATUS , a.create_time , a.create_on , a.modify_time , a.modify_on , a.supplier_id , a.is_delete , a.CODE , b.type_name type_1_name , b1.type_name type_2_name , c.util_name, d.username
+        FROM
+        product                  a
+        INNER JOIN  product_type b  ON a.type_1=b.id
+        INNER JOIN  product_type b1 ON a.type_2=b1.id
+        INNER JOIN  product_util c  ON a.unit = c.id
+        INNER JOIN  member 	     d  ON a.create_on = d.id
+        WHERE a.is_delete=0
+        <if test="keyword!=null and keyword!=''">
+            and ( a.name like '%'+#{keyword}+'%' or a.code like '%'+#{keyword}+'%' )
+        </if>
+        <if test="typeid!=null and typeid!=''">
+            and (b1.id = #{typeid} or b.id=#{typeid})
+        </if>
+        <if test="status!=null and status!=''">
+            and a.status =#{status}
+        </if>
+        <if test="createrid!=null and createrid!=''">
+            and a.create_on =#{createrid}
+        </if>
+        order by
+        a.modify_time desc,a.create_time desc
+    </select>
+
+    <select id="selectMaxPartNo" resultType="string">
+        select * from product where name like ${tag}+'-'+${type1}
+
+    </select>
+
+</mapper>

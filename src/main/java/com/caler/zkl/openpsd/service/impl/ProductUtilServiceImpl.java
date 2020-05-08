@@ -52,6 +52,8 @@ public class ProductUtilServiceImpl implements ProductUtilService {
 
     @Override
     public List<ProductUtil> list() {
+        ProductUtilExample example = new ProductUtilExample();
+        example.createCriteria().andStatusEqualTo(1);
         return memberMapper.selectByExample(null);
     }
 
@@ -59,6 +61,7 @@ public class ProductUtilServiceImpl implements ProductUtilService {
     public List<ProductUtil> list(String keyword, Integer pageSize, Integer pageNum) {
         PageHelper.startPage(pageNum,pageSize);
         ProductUtilExample example = new ProductUtilExample();
+        example.setOrderByClause("sort");
         //设置条件
         return memberMapper.selectByExample(example);
     }

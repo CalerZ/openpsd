@@ -1,9 +1,6 @@
 package com.caler.zkl.openpsd.controller;
 
-import com.caler.zkl.openpsd.bean.ApplicationProduct;
-import com.caler.zkl.openpsd.bean.Product;
-import com.caler.zkl.openpsd.bean.ProductDetail;
-import com.caler.zkl.openpsd.bean.PurchaseMethod;
+import com.caler.zkl.openpsd.bean.*;
 import com.caler.zkl.openpsd.common.CommonPage;
 import com.caler.zkl.openpsd.common.CommonResult;
 import com.caler.zkl.openpsd.service.ProductService;
@@ -97,7 +94,7 @@ public class ProductController {
                              @RequestParam(value = "createrid",required = false) Long createrid,
                              @RequestParam(value = "pageSize",required = true,defaultValue = "10") Integer pageSize,
                              @RequestParam(value = "pageNum",required = true,defaultValue = "1") Integer pageNum){
-        List<Product> memberList = memberService.list(keyword,typeid,status,createrid, pageSize, pageNum);
+        List<ProductBean> memberList = memberService.list(keyword,typeid,status,createrid, pageSize, pageNum);
         return CommonResult.success(CommonPage.restPage(memberList));
 
     }
@@ -121,6 +118,16 @@ public class ProductController {
     public CommonResult applicationProductList(@RequestBody  List<Long> ids){
         List<ApplicationProduct> list = memberService.applicationProductList(ids);
         return CommonResult.success(list);
+    }
+
+    /**
+     * 查询所有
+     */
+    @PostMapping("/productNo")
+    @ApiOperation("获取物料编码")
+    public CommonResult getProductNo(){
+        String productNo = memberService.getProductNo();
+        return CommonResult.success(productNo);
     }
 
 

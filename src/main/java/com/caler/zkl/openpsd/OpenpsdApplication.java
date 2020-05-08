@@ -2,12 +2,19 @@ package com.caler.zkl.openpsd;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @SpringBootApplication
-public class OpenpsdApplication {
+public class OpenpsdApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         SpringApplication.run(OpenpsdApplication.class, args);
+    }
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(OpenpsdApplication.class);
     }
 
 }

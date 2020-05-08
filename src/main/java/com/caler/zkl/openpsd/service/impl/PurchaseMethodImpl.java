@@ -53,7 +53,9 @@ public class PurchaseMethodImpl implements PurchaseMethodService {
 
     @Override
     public List<PurchaseMethod> list() {
-        return purchaseMethodMapper.selectByExample(null);
+        PurchaseMethodExample example = new PurchaseMethodExample();
+        example.createCriteria().andStatusEqualTo(1);
+        return purchaseMethodMapper.selectByExample(example);
     }
 
     @Override

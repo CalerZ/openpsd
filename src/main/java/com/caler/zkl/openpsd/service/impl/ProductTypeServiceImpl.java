@@ -27,9 +27,9 @@ public class ProductTypeServiceImpl implements ProductTypeService {
     @Override
     public int create(ProductType productType) {
         productType.setCreateTime(new Date());
-        if(productType.getpId()!=0){
+        if (productType.getpId() != 0) {
             productType.setLevel(1);
-        }else {
+        } else {
             productType.setLevel(0);
         }
         return productTypeMapper.insertSelective(productType);
@@ -43,14 +43,21 @@ public class ProductTypeServiceImpl implements ProductTypeService {
     @Override
     public int delete(List<Long> ids) {
         int count = 0;
-        for (long id:ids) {
-           count+= productTypeMapper.deleteByPrimaryKey(id);
+        for (long id : ids) {
+            count += productTypeMapper.deleteByPrimaryKey(id);
+            ProductTypeExample example = new ProductTypeExample();
+            example.createCriteria().andPIdEqualTo(id);
+            productTypeMapper.deleteByExample(example);
         }
         return count;
     }
+
     @Override
     public int delete(Long id) {
-        return  productTypeMapper.deleteByPrimaryKey(id);
+        ProductTypeExample example = new ProductTypeExample();
+        example.createCriteria().andPIdEqualTo(id);
+        productTypeMapper.deleteByExample(example);
+        return productTypeMapper.deleteByPrimaryKey(id);
     }
 
     @Override
@@ -60,23 +67,28 @@ public class ProductTypeServiceImpl implements ProductTypeService {
 
     @Override
     public List<ProductType> list() {
-        return productTypeMapper.selectByExample(null);
+        ProductTypeExample example = new ProductTypeExample();
+        example.createCriteria().andStatusEqualTo(1);
+        return productTypeMapper.selectByExample(example);
     }
 
     @Override
-    public List<ProductType> list(Long pid,String keyword, Integer pageSize, Integer pageNum) {
-        PageHelper.startPage(pageNum,pageSize);
+    public List<ProductType> list(Long pid, String keyword, Integer pageSize, Integer pageNum) {
+        PageHelper.startPage(pageNum, pageSize);
         ProductTypeExample example = new ProductTypeExample();
+        example.setOrderByClause("sort");
         example.createCriteria().andPIdEqualTo(pid);
-        if(!StrUtil.isEmpty(keyword))
-            example.createCriteria().andTypeNameLike("%"+keyword+"%");
+        if (!StrUtil.isEmpty(keyword))
+            example.createCriteria().andTypeNameLike("%" + keyword + "%");
         //设置条件
         return productTypeMapper.selectByExample(example);
     }
 
     @Override
     public List<ProductTypeNode> treeList() {
-        List<ProductType> productTypeList = productTypeMapper.selectByExample(null);
+        ProductTypeExample example = new ProductTypeExample();
+        example.createCriteria().andStatusEqualTo(1);
+        List<ProductType> productTypeList = productTypeMapper.selectByExample(example);
         List<ProductTypeNode> result = productTypeList.stream()
                 .filter(ptype -> ptype.getpId().equals(0L))
                 .map(ptype -> covertMenuNode(ptype, productTypeList)).collect(Collectors.toList());

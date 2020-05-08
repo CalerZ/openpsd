@@ -1,10 +1,7 @@
 package com.caler.zkl.openpsd.service;
 
 
-import com.caler.zkl.openpsd.bean.ApplicationProduct;
-import com.caler.zkl.openpsd.bean.Product;
-import com.caler.zkl.openpsd.bean.ProductDetail;
-import com.caler.zkl.openpsd.bean.PurchaseMethod;
+import com.caler.zkl.openpsd.bean.*;
 
 import java.util.List;
 
@@ -42,7 +39,7 @@ public interface ProductService {
     /**
      * 条件分页查询
      */
-    List<Product> list(String keyword, Long typeid, Integer status, Long createrid, Integer pageSize, Integer pageNum);
+    List<ProductBean> list(String keyword, Long typeid, Integer status, Long createrid, Integer pageSize, Integer pageNum);
 
 
     int delete(Long id);
@@ -50,4 +47,6 @@ public interface ProductService {
     List<PurchaseMethod> purchaseMethodlist();
 
     List<ApplicationProduct> applicationProductList(List<Long> ids);
+
+    String getProductNo();
 }

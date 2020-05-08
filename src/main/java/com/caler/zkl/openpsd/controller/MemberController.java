@@ -93,6 +93,17 @@ public class MemberController {
 
 
     /**
+     * 查询所有
+     */
+    @GetMapping("/checkName")
+    @ApiOperation("查询所有用户")
+    public CommonResult list(@RequestParam(value = "username",required = true) String username){
+        Boolean byName = memberService.checkByName(username);
+        return CommonResult.success(byName);
+    }
+
+
+    /**
      * 条件分页查询
      */
     @PostMapping("/list")

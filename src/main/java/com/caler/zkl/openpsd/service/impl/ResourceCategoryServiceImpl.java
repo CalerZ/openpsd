@@ -67,6 +67,7 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService {
         if (keyword != null)
             example.createCriteria().andNameLike("%" + keyword + "%");
         //设置条件
+        example.setOrderByClause("sort");
         return resourceCategoryMapper.selectByExample(example);
     }
 }

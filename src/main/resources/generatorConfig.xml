@@ -42,7 +42,7 @@
 <!--            <generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
 <!--        </table>-->
 
-        <table tableName="sys_dict">
+        <table tableName="purchase_method">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
 
