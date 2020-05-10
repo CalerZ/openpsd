@@ -49,8 +49,4 @@ public class ProductExcelData {
     @ExcelColumn(value = "采购方式", col = 13)
     private String purchaseMethod;
 
-
-
-
-
 }

@@ -25,6 +25,9 @@ public class ProductType implements Serializable {
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
+    @ApiModelProperty(value = "用于物品编码")
+    private String code;
+
     @ApiModelProperty(value = "描述")
     private String description;
 
@@ -86,6 +89,14 @@ public class ProductType implements Serializable {
         this.createTime = createTime;
     }
 
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -107,6 +118,7 @@ public class ProductType implements Serializable {
         sb.append(", level=").append(level);
         sb.append(", sort=").append(sort);
         sb.append(", createTime=").append(createTime);
+        sb.append(", code=").append(code);
         sb.append(", description=").append(description);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");

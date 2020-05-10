@@ -54,8 +54,41 @@
     </select>
 
     <select id="selectMaxPartNo" resultType="string">
-        select * from product where name like ${tag}+'-'+${type1}
+        select max(code)  code from product where code like #{tag}
+    </select>
+
+
+
+    <resultMap id="excelDataMap" type="com.caler.zkl.openpsd.common.ProductExcelData">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="type" property="type"/>
+        <result column="product_name" property="productName"/>
+        <result column="specifications" property="specifications"/>
+        <result column="util_name" property="unit"/>
+        <result column="price" property="price"/>
+        <result column="standard" property="standard"/>
+
+        <result column="prod_line_members" property="prodLineMembers"/>
+        <result column="safety_stock" property="safetyStock"/>
+        <result column="last_month_quantity" property="lastMonthQuantity"/>
+        <result column="on_hand_inventory" property="onHandInventory"/>
+        <result column="reported_quantity" property="reportedQuantity"/>
+        <result column="purchase_method" property="purchaseMethod"/>
+    </resultMap>
+
+    <select id="getExcelData" resultMap="excelDataMap">
+        SELECT CONCAT(b.type_name,'(',b1.type_name,')') type, a.product_name,a.specifications,c.util_name,a.price,
+        a.standard,d.safety_stock,d.last_month_quantity ,d.on_hand_inventory,d.reported_quantity,f.name purchase_method ,
+        d.prod_line_members
+        FROM application_product a
+        LEFT JOIN product_type b ON a.type_1 = b.id
+        LEFT JOIN product_type b1 ON a.type_2 = b1.id
+        LEFT JOIN product_util c ON a.unit=c.id
+        INNER JOIN stock d ON a.id=d.product_id
+        LEFT JOIN purchase_method f ON d.purchase_method=f.id
+        WHERE a.is_delete=0 AND a.status=1
 
     </select>
+
 
 </mapper>

@@ -1,7 +1,7 @@
 package com.caler.zkl.openpsd.service.impl;
 
-import cn.hutool.core.date.DateTime;
 import com.caler.zkl.openpsd.bean.*;
+import com.caler.zkl.openpsd.mapper.ApplicationFormDao;
 import com.caler.zkl.openpsd.mapper.ApplicationFormMapper;
 import com.caler.zkl.openpsd.mapper.ApplicationProductMapper;
 import com.caler.zkl.openpsd.mapper.SysDictMapper;
@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,8 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Autowired
     private SysDictMapper sysDictMapper;
+    @Autowired
+    private ApplicationFormDao applicationFormDao;
 
     @Override
     @Transactional
@@ -54,7 +57,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             //流水号更新
             SysDict s = new SysDict();
             s.setId(4L);
-            s.setDataValue(applicationForm.getFormCode().substring(applicationForm.getFormCode().lastIndexOf("-")+1));
+            s.setDataValue(applicationForm.getFormCode().substring(applicationForm.getFormCode().lastIndexOf("-") + 1));
             sysDictMapper.updateByPrimaryKeySelective(s);//更新流水号
             //添加明细
             List<ApplicationProduct> productList = application.getApplicationProducts();
@@ -163,21 +166,25 @@ public class ApplicationServiceImpl implements ApplicationService {
         }).collect(Collectors.toList());
     }
 
-    @Override
     public List<Application> reviewedApplicationList(String keyword, Integer pageSize, Integer pageNum) {
         PageHelper.startPage(pageNum, pageSize);
         ApplicationFormExample example = new ApplicationFormExample();
         example.createCriteria()
                 .andApproverEqualTo(userServiceUtil.getUser().getId())
                 .andApplyStatusEqualTo(0)
-                .andIsDeleteEqualTo(0)
-                .andApplyOnNotEqualTo(userServiceUtil.getUser().getId());
+                .andIsDeleteEqualTo(0);
         return applicationFormMapper.selectByExample(example).stream().map(item -> {
             Application application = new Application();
             application.setApplicationForm(item);
             return application;
         }).collect(Collectors.toList());
     }
+
+//    @Override
+//    public List<Application> reviewedApplicationList(String keyword, int status, Integer pageSize, Integer pageNum) {
+//        PageHelper.startPage(pageNum, pageSize);
+//       return  applicationFormDao.reviewedApplicationList(keyword,status,userServiceUtil.getUser().getId());
+//    }
 
     @Override
     @Transactional
@@ -218,16 +225,28 @@ public class ApplicationServiceImpl implements ApplicationService {
                 if ("t3".equals(dataCode)) {//流水号
                     formNo.append("-");
                     SysDict sysDict = dictList.get(0);
-                    String no = String.format("%0"+item.getDataValue()+"d", Integer.parseInt(sysDict.getDataValue())+1);
+                    String no = String.format("%0" + item.getDataValue() + "d", Integer.parseInt(sysDict.getDataValue()) + 1);
                     formNo.append(no);
                 }
             } catch (NumberFormatException e) {
                 e.printStackTrace();
-            }finally {
+            } finally {
                 lock.unlock();
             }
         });
 
         return formNo.toString();
+    }
+
+    @Override
+    public int updateStatus(List<Long> ids) {
+        AtomicInteger count = new AtomicInteger();
+        ids.forEach(item -> {
+            ApplicationForm applicationForm = new ApplicationForm();
+            applicationForm.setId(item);
+            applicationForm.setApplyStatus(1);
+            count.addAndGet(applicationFormMapper.updateByPrimaryKeySelective(applicationForm));
+        });
+        return count.get();
     }
 }

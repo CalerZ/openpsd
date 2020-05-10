@@ -125,8 +125,9 @@ public class ProductController {
      */
     @PostMapping("/productNo")
     @ApiOperation("获取物料编码")
-    public CommonResult getProductNo(){
-        String productNo = memberService.getProductNo();
+    public CommonResult getProductNo(@RequestParam(value = "type1",required = true) Long type1,
+                                     @RequestParam(value = "type2",required = true) Long type2){
+        String productNo = memberService.getProductNo(type1,type2);
         return CommonResult.success(productNo);
     }
 

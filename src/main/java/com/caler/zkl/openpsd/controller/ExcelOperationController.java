@@ -3,10 +3,12 @@ package com.caler.zkl.openpsd.controller;
 import java.io.IOException;
 import java.util.*;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.caler.zkl.openpsd.bean.ExcelData;
 import com.caler.zkl.openpsd.bean.Product;
 import com.caler.zkl.openpsd.common.CommonResult;
 import com.caler.zkl.openpsd.common.ProductExcelData;
+import com.caler.zkl.openpsd.mapper.ProductDao;
 import com.caler.zkl.openpsd.mapper.ProductMapper;
 import com.caler.zkl.openpsd.util.ExcelUtil;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +28,7 @@ public class ExcelOperationController {
 
 
     @Autowired
-    private ProductMapper productMapper;
+    private ProductDao productDao;
 
     /**
      * 导出excel
@@ -41,45 +43,24 @@ public class ExcelOperationController {
             return CommonResult.success(null);
         }
         //根据id去查询分类
-        Set<ExcelData> set = new TreeSet();
-        ids.forEach(item -> {
-//            //根据id选取分类
-//            Product product = productMapper.selectByPrimaryKey(item);
-//            String typeName = product.getType1() + "(" + product.getType2() + ")";
-//            ExcelData excelData =  set.stream().filter(t -> {
-//                if (!t.getTypeName().equals(typeName)) {
-//                    ExcelData data = new ExcelData();
-//                    data.setTypeName(typeName);
-//                    set.add(data);
-//                    return true;
-//                }else{
-//                    return false;
-//                }
-//            }).;
-
-
+        Map<String, List<ProductExcelData>> map = new HashMap<>();
+        List<ProductExcelData> productExcelDatas = productDao.getExcelData(ids);
+        productExcelDatas.forEach(item->{
+            if(!map.containsKey(item.getType())){
+                List<ProductExcelData> list = new ArrayList<>();
+                item.setNoid(1+"");
+                list.add(item);
+                map.put(item.getType(), list);
+            }else{
+                List<ProductExcelData> list = map.get(item.getType());
+                item.setNoid(list.size()+1+"");
+                list.add(item);
+                map.put(item.getType(),list);
+            }
         });
 
-        List<ProductExcelData> resultList = new ArrayList<ProductExcelData>();
-        for (int i = 0; i < 100; i++) {
-            ProductExcelData productExcelData = new ProductExcelData();
-            productExcelData.setNoid(i + "");
-            productExcelData.setType("类型" + i);
-            productExcelData.setProductName("物品名称" + i);
-            productExcelData.setSpecifications("规格" + i);
-            productExcelData.setUnit(i + "");
-            productExcelData.setPrice(i + "");
-            productExcelData.setStandard("标准" + i);
-            productExcelData.setProdLineMembers(i + "");
-            productExcelData.setSafetyStock(i + "");
-            productExcelData.setLastMonthQuantity(i + "");
-            productExcelData.setOnHandInventory(i + "");
-            productExcelData.setReportedQuantity("" + i);
-            productExcelData.setPurchaseMethod(i + "");
-            resultList.add(productExcelData);
-        }
         long t1 = System.currentTimeMillis();
-        ExcelUtil.writeExcel(response, resultList, ProductExcelData.class);
+        ExcelUtil.writeExcel(response, map, ProductExcelData.class);
         long t2 = System.currentTimeMillis();
         log.info(String.format("write over! cost:%sms", (t2 - t1)));
         return CommonResult.success(null);

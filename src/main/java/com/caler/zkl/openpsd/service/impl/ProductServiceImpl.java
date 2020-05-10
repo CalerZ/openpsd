@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.caler.zkl.openpsd.bean.*;
+import com.caler.zkl.openpsd.common.ProductExcelData;
 import com.caler.zkl.openpsd.exception.BizException;
 import com.caler.zkl.openpsd.mapper.*;
 import com.caler.zkl.openpsd.service.MemberService;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.rmi.CORBA.Util;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,6 +46,8 @@ public class ProductServiceImpl implements ProductService {
     private UserServiceUtil userServiceUtil;
     @Autowired
     private SysDictMapper sysDictMapper;
+    @Autowired
+    private ProductTypeMapper productTypeMapper;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -138,35 +142,50 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public String getProductNo() {
+    public String getProductNo(Long type1, Long type2) {
         //编码规则
         SysDictExample example = new SysDictExample();
         example.createCriteria().andDataTypeEqualTo("3");
         example.setOrderByClause("sort");
         List<SysDict> dicts = sysDictMapper.selectByExample(example);
-        final  StringBuilder partNo = new StringBuilder();
+        final StringBuilder partNo = new StringBuilder();
+        //获取类型编码
+        ProductType productType1 = productTypeMapper.selectByPrimaryKey(type1);
+        ProductType productType2 = productTypeMapper.selectByPrimaryKey(type2);
+
 
         dicts.forEach(item -> {
-            if("t1".equals(item.getDataCode())){//标识
+            if ("t1".equals(item.getDataCode())) {//标识
                 partNo.append(item.getDataValue());
             }
-            if("t2".equals(item.getDataCode())){
+            if ("t2".equals(item.getDataCode()) && productType1 != null) {
                 partNo.append("-");
-                partNo.append("095");
+                partNo.append("".equals(productType1.getCode()) ? 0 : productType1.getCode());
             }
-            if("t3".equals(item.getDataCode())){
+            if ("t3".equals(item.getDataCode()) && productType2 != null) {
                 partNo.append("-");
-                partNo.append("01");
+                partNo.append("".equals(productType2.getCode()) ? 0 : productType2.getCode());
             }
-            if("t4".equals(item.getDataCode())){
+            if ("t4".equals(item.getDataCode())) {
                 partNo.append("-");
-//                String  maxPartNo =  productDao.selectMaxPartNo("095","01");
-                String no = String.format("%0"+item.getDataValue()+"d", 1);
-                partNo.append(no);
+                String maxPartNo = productDao.selectMaxPartNo(partNo.toString() + "%");
+                if (maxPartNo == null || "".equals(maxPartNo)) {
+                    String no = String.format("%0" + item.getDataValue() + "d", 1);
+                    partNo.append(no);
+                } else {
+                    int maxNo = Integer.parseInt(maxPartNo.substring(partNo.toString().length()));
+                    String no = String.format("%0" + item.getDataValue() + "d", maxNo + 1);
+                    partNo.append(no);
+                }
             }
 
         });
         return partNo.toString();
+    }
+
+    @Override
+    public List<ProductExcelData>  getExcelData(List<Long> ids) {
+        return  productDao.getExcelData(ids);
     }
 
     @Override

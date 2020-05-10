@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caler.zkl.openpsd.mapper.ApplicationFormDao">
+  <resultMap id="BaseResultMap" type="com.caler.zkl.openpsd.bean.applicationFormBean">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="form_code" jdbcType="VARCHAR" property="formCode" />
+    <result column="apply_company" jdbcType="BIGINT" property="applyCompany" />
+    <result column="apply_status" jdbcType="INTEGER" property="applyStatus" />
+    <result column="apply_on" jdbcType="BIGINT" property="applyOn" />
+    <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime" />
+    <result column="approver" jdbcType="BIGINT" property="approver" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="modify_on" jdbcType="BIGINT" property="modifyOn" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+    <result column="company_name" property="companyName"/>
+    <result column="create_name" property="createrName"/>
+  </resultMap>
+
+  <select id="list" resultMap="BaseResultMap">
+    SELECT a.*,b.name company_name,c.nickname create_name
+    FROM application_form a,company b,member c
+    WHERE a.apply_company=b.id AND a.apply_on=c.id and a.is_delete=0
+    <if test="keyword!=null and keyword!=''">
+      and a.code like #{keyword}
+    </if>
+    <if test="status!=null and status!=''">
+      and a.status = #{status}
+    </if>
+
+    order by a.modify_time des,a.apply_tim desc
+
+  </select>
+
+  <select id="myApplicationList" resultMap="BaseResultMap">
+    SELECT a.*,b.name company_name,c.nickname create_name
+    FROM application_form a,company b,member c
+    WHERE a.apply_company=b.id AND a.apply_on=c.id and a.is_delete=0 and apply_on=#{userid}
+    <if test="keyword!=null and keyword!=''">
+      and a.code like #{keyword}
+    </if>
+    <if test="status!=null and status!=''">
+      and a.status = #{status}
+    </if>
+
+    order by a.modify_time des,a.apply_tim desc
+
+  </select>
+
+  <select id="reviewedApplicationList" resultMap="BaseResultMap">
+    SELECT a.*,b.name company_name,c.nickname create_name
+    FROM application_form a,company b,member c
+    WHERE a.apply_company=b.id AND a.apply_on=c.id
+    and a.is_delete=0 and a.approver = #{userid}
+    and a.status=0
+    <if test="keyword!=null and keyword!=''">
+      and a.code like #{keyword}
+    </if>
+    <if test="status!=null and status!=''">
+      and a.status = #{status}
+    </if>
+
+    order by a.modify_time des,a.apply_tim desc
+
+  </select>
+</mapper>

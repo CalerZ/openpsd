@@ -49,4 +49,6 @@ public interface ApplicationService {
     int submit(Application application);
 
     String generateFormNo();
+
+    int updateStatus(List<Long> ids);
 }

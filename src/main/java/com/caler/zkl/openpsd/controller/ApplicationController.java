@@ -52,6 +52,15 @@ public class ApplicationController {
     }
 
     /**
+     * 批量修改状态
+     */
+    @PostMapping("/updateStatus")
+    @ApiOperation("批量修改状态")
+    public CommonResult updateStatus(@RequestBody List<Long> ids) {
+        return CommonResult.success(applicationService.updateStatus(ids) > 0 ? true : false);
+    }
+
+    /**
      * 批量删除
      */
     @PostMapping("/delete")

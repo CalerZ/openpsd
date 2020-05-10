@@ -2,6 +2,7 @@ package com.caler.zkl.openpsd.service;
 
 
 import com.caler.zkl.openpsd.bean.*;
+import com.caler.zkl.openpsd.common.ProductExcelData;
 
 import java.util.List;
 
@@ -48,5 +49,7 @@ public interface ProductService {
 
     List<ApplicationProduct> applicationProductList(List<Long> ids);
 
-    String getProductNo();
+    String getProductNo(Long type1,Long type2);
+
+    List<ProductExcelData> getExcelData(List<Long> ids);
 }

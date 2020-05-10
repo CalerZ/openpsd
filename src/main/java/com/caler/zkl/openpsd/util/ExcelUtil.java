@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletResponse;
 
 import com.caler.zkl.openpsd.anno.ExcelColumn;
+import com.caler.zkl.openpsd.common.ProductExcelData;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -239,7 +240,7 @@ public class ExcelUtil {
      * @param cls
      * @param <T>
      */
-    public static <T> void writeExcel(HttpServletResponse response, List<T> dataList, Class<T> cls) {
+    public static <T> void writeExcel(HttpServletResponse response, Map<String, List<ProductExcelData>> map, Class<T> cls) {
         Field[] fields = cls.getDeclaredFields();
         List<Field> fieldList = Arrays.stream(fields)
                 .filter(field -> {
@@ -259,8 +260,8 @@ public class ExcelUtil {
                 })).collect(Collectors.toList());
 
         Workbook wb = new XSSFWorkbook();
-        for (int i = 0; i < 5; i++) {
-            Sheet sheet = wb.createSheet("Sheet"+i);
+        for (String key:map.keySet()) {
+            Sheet sheet = wb.createSheet(key);
             AtomicInteger ai = new AtomicInteger();
             {
                 Row row = sheet.createRow(ai.getAndIncrement());
@@ -286,8 +287,8 @@ public class ExcelUtil {
                     cell.setCellValue(columnName);
                 });
             }
-            if (dataList.size() > 0) {
-                dataList.forEach(t -> {
+            if (map.get(key).size() > 0) {
+                map.get(key).forEach(t -> {
                     Row row1 = sheet.createRow(ai.getAndIncrement());
                     AtomicInteger aj = new AtomicInteger();
                     fieldList.forEach(field -> {
@@ -300,18 +301,13 @@ public class ExcelUtil {
                         }
                         Cell cell = row1.createCell(aj.getAndIncrement());
                         if (value != null) {
-                            if (type == Date.class) {
-                                cell.setCellValue(value.toString());
-                            } else {
-                                cell.setCellValue(value.toString());
-                            }
                             cell.setCellValue(value.toString());
                         }
                     });
                 });
             }
             //冻结窗格
-            wb.getSheet("Sheet"+i).createFreezePane(0, 1, 0, 1);
+            wb.getSheet(key).createFreezePane(0, 1, 0, 1);
         }
         //浏览器下载excel
         buildExcelDocument("abbot.xlsx", wb, response);
