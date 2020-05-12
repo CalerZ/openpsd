@@ -99,6 +99,22 @@ public class ProductController {
 
     }
 
+    /**
+     * 条件分页查询
+     */
+    @PostMapping("/releaseList")
+    @ApiOperation("查询已发布的物品")
+    public CommonResult list(@RequestParam(value = "keyword",required = false) String keyword,
+                             @RequestParam(value = "typeid",required = false) Long typeid,
+                             @RequestParam(value = "createrid",required = false) Long createrid,
+                             @RequestParam(value = "pageSize",required = true,defaultValue = "10") Integer pageSize,
+                             @RequestParam(value = "pageNum",required = true,defaultValue = "1") Integer pageNum){
+        List<ProductBean> memberList = memberService.list(keyword,typeid,1,createrid, pageSize, pageNum);
+        return CommonResult.success(CommonPage.restPage(memberList));
+
+    }
+
+
 
     /**
      * 查询所有

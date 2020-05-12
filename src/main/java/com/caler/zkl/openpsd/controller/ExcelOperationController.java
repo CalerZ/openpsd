@@ -8,8 +8,10 @@ import com.caler.zkl.openpsd.bean.ExcelData;
 import com.caler.zkl.openpsd.bean.Product;
 import com.caler.zkl.openpsd.common.CommonResult;
 import com.caler.zkl.openpsd.common.ProductExcelData;
+import com.caler.zkl.openpsd.mapper.ApplicationFormDao;
 import com.caler.zkl.openpsd.mapper.ProductDao;
 import com.caler.zkl.openpsd.mapper.ProductMapper;
+import com.caler.zkl.openpsd.service.ApplicationService;
 import com.caler.zkl.openpsd.util.ExcelUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +30,7 @@ public class ExcelOperationController {
 
 
     @Autowired
-    private ProductDao productDao;
+    private com.caler.zkl.openpsd.service.ApplicationService applicationService;
 
     /**
      * 导出excel
@@ -37,25 +39,28 @@ public class ExcelOperationController {
      * @throws IOException
      */
     @PostMapping("/exportExcel")
-    public CommonResult exportExcel(@RequestBody List<Long> ids, HttpServletResponse response) throws IOException {
-        log.info(ids);
-        if (ids == null || ids.size() == 0) {
-            return CommonResult.success(null);
-        }
+    public CommonResult exportExcel(
+            @RequestParam(value = "quarter", required = false) String quarter,
+            @RequestParam(value = "date[]", required = false) String[] date,
+            @RequestParam(value = "year", required = false) String year,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
+            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum ,
+            HttpServletResponse response) throws IOException {
+
         //根据id去查询分类
         Map<String, List<ProductExcelData>> map = new HashMap<>();
-        List<ProductExcelData> productExcelDatas = productDao.getExcelData(ids);
-        productExcelDatas.forEach(item->{
-            if(!map.containsKey(item.getType())){
+        List<ProductExcelData> productExcelDatas = applicationService.getExcelData(date,quarter,year);
+        productExcelDatas.forEach(item -> {
+            if (!map.containsKey(item.getType())) {
                 List<ProductExcelData> list = new ArrayList<>();
-                item.setNoid(1+"");
+                item.setNoid(1 + "");
                 list.add(item);
                 map.put(item.getType(), list);
-            }else{
+            } else {
                 List<ProductExcelData> list = map.get(item.getType());
-                item.setNoid(list.size()+1+"");
+                item.setNoid(list.size() + 1 + "");
                 list.add(item);
-                map.put(item.getType(),list);
+                map.put(item.getType(), list);
             }
         });
 
@@ -63,7 +68,7 @@ public class ExcelOperationController {
         ExcelUtil.writeExcel(response, map, ProductExcelData.class);
         long t2 = System.currentTimeMillis();
         log.info(String.format("write over! cost:%sms", (t2 - t1)));
-        return CommonResult.success(null);
+        return CommonResult.success("物料信息导出.xlsx");
     }
 
     /**

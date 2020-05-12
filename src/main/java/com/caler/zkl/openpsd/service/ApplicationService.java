@@ -2,6 +2,7 @@ package com.caler.zkl.openpsd.service;
 
 
 import com.caler.zkl.openpsd.bean.Application;
+import com.caler.zkl.openpsd.common.ProductExcelData;
 
 import java.util.List;
 
@@ -51,4 +52,12 @@ public interface ApplicationService {
     String generateFormNo();
 
     int updateStatus(List<Long> ids);
+
+    List<ProductExcelData> getExcelData(String[] date, String quarter, String year);
+
+    List<ProductExcelData> getExcelDataList(String[] date, String quarter, String year, Integer pageSize, Integer pageNum);
+
+    int finish(Application application);
+
+    int cancel(Long id);
 }

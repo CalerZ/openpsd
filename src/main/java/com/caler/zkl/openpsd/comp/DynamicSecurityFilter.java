@@ -1,9 +1,12 @@
 package com.caler.zkl.openpsd.comp;
 
 import com.caler.zkl.openpsd.config.IgnoreUrlsConfig;
+import com.caler.zkl.openpsd.config.SystemCtlConfig;
 import com.caler.zkl.openpsd.util.SpringUtil;
+import com.caler.zkl.openpsd.util.UserServiceUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.SecurityMetadataSource;
 import org.springframework.security.access.intercept.AbstractSecurityInterceptor;
 import org.springframework.security.access.intercept.InterceptorStatusToken;
@@ -14,6 +17,7 @@ import org.springframework.util.PathMatcher;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * 动态权限过滤器，用于实现基于路径的动态权限过滤
@@ -25,6 +29,7 @@ public class DynamicSecurityFilter extends AbstractSecurityInterceptor implement
     private DynamicSecurityMetadataSource dynamicSecurityMetadataSource ;
     @Autowired
     private IgnoreUrlsConfig ignoreUrlsConfig ;
+
 
     @Autowired
     public void setMyAccessDecisionManager(DynamicAccessDecisionManager dynamicAccessDecisionManager) {
@@ -52,6 +57,8 @@ public class DynamicSecurityFilter extends AbstractSecurityInterceptor implement
                 return;
             }
         }
+
+
         //此处会调用AccessDecisionManager中的decide方法进行鉴权操作
         InterceptorStatusToken token = super.beforeInvocation(fi);
         try {

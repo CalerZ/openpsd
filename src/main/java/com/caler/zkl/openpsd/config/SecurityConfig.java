@@ -80,7 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         registry.and().csrf().disable();
 
         //是否缓存session
-        registry.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+        registry.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         //无权限异常处理类
 //        registry.and().exceptionHandling().accessDeniedPage("/notice");

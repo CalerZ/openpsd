@@ -51,5 +51,4 @@ public interface ProductService {
 
     String getProductNo(Long type1,Long type2);
 
-    List<ProductExcelData> getExcelData(List<Long> ids);
 }

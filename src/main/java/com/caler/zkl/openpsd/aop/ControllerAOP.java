@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -25,11 +26,9 @@ public class ControllerAOP {
     @Around("execution (* com.caler.zkl.openpsd.controller.*.*(..))")
     public Object testAop(ProceedingJoinPoint pro) throws Throwable {
 
-        System.out.println("=====================");
         //获取response
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
-        //核心设置
-        response.setHeader("Access-Control-Allow-Origin", "*");
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
         //执行调用的方法
         Object proceed = pro.proceed();

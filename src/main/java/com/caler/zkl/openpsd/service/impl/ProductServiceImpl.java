@@ -183,10 +183,7 @@ public class ProductServiceImpl implements ProductService {
         return partNo.toString();
     }
 
-    @Override
-    public List<ProductExcelData>  getExcelData(List<Long> ids) {
-        return  productDao.getExcelData(ids);
-    }
+
 
     @Override
     public ProductDetail list(Long id) {

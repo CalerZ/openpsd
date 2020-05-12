@@ -1,66 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.caler.zkl.openpsd.mapper.ApplicationFormDao">
-  <resultMap id="BaseResultMap" type="com.caler.zkl.openpsd.bean.applicationFormBean">
-    <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="form_code" jdbcType="VARCHAR" property="formCode" />
-    <result column="apply_company" jdbcType="BIGINT" property="applyCompany" />
-    <result column="apply_status" jdbcType="INTEGER" property="applyStatus" />
-    <result column="apply_on" jdbcType="BIGINT" property="applyOn" />
-    <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime" />
-    <result column="approver" jdbcType="BIGINT" property="approver" />
-    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
-    <result column="modify_on" jdbcType="BIGINT" property="modifyOn" />
-    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
-    <result column="description" jdbcType="LONGVARCHAR" property="description" />
-    <result column="company_name" property="companyName"/>
-    <result column="create_name" property="createrName"/>
-  </resultMap>
+    <resultMap id="BaseResultMap" type="com.caler.zkl.openpsd.bean.applicationFormBean">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="form_code" jdbcType="VARCHAR" property="formCode"/>
+        <result column="apply_company" jdbcType="BIGINT" property="applyCompany"/>
+        <result column="apply_status" jdbcType="INTEGER" property="applyStatus"/>
+        <result column="apply_on" jdbcType="BIGINT" property="applyOn"/>
+        <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime"/>
+        <result column="approver" jdbcType="BIGINT" property="approver"/>
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
+        <result column="modify_on" jdbcType="BIGINT" property="modifyOn"/>
+        <result column="is_delete" jdbcType="INTEGER" property="isDelete"/>
+        <result column="description" jdbcType="LONGVARCHAR" property="description"/>
+        <result column="company_name" property="companyName"/>
+        <result column="create_name" property="createrName"/>
+    </resultMap>
 
-  <select id="list" resultMap="BaseResultMap">
-    SELECT a.*,b.name company_name,c.nickname create_name
-    FROM application_form a,company b,member c
-    WHERE a.apply_company=b.id AND a.apply_on=c.id and a.is_delete=0
-    <if test="keyword!=null and keyword!=''">
-      and a.code like #{keyword}
-    </if>
-    <if test="status!=null and status!=''">
-      and a.status = #{status}
-    </if>
+    <select id="list" resultMap="BaseResultMap">
+        SELECT a.*,b.name company_name,c.nickname create_name
+        FROM application_form a,company b,member c
+        WHERE a.apply_company=b.id AND a.apply_on=c.id and a.is_delete=0
+        <if test="keyword!=null and keyword!=''">
+            and a.code like #{keyword}
+        </if>
+        <if test="status!=null and status!=''">
+            and a.status = #{status}
+        </if>
+        order by a.modify_time des,a.apply_tim desc
+    </select>
 
-    order by a.modify_time des,a.apply_tim desc
+    <select id="myApplicationList" resultMap="BaseResultMap">
+        SELECT a.*,b.name company_name,c.nickname create_name
+        FROM application_form a,company b,member c
+        WHERE a.apply_company=b.id AND a.apply_on=c.id and a.is_delete=0 and apply_on=#{userid}
+        <if test="keyword!=null and keyword!=''">
+            and a.code like #{keyword}
+        </if>
+        <if test="status!=null and status!=''">
+            and a.status = #{status}
+        </if>
 
-  </select>
+        order by a.modify_time des,a.apply_tim desc
 
-  <select id="myApplicationList" resultMap="BaseResultMap">
-    SELECT a.*,b.name company_name,c.nickname create_name
-    FROM application_form a,company b,member c
-    WHERE a.apply_company=b.id AND a.apply_on=c.id and a.is_delete=0 and apply_on=#{userid}
-    <if test="keyword!=null and keyword!=''">
-      and a.code like #{keyword}
-    </if>
-    <if test="status!=null and status!=''">
-      and a.status = #{status}
-    </if>
+    </select>
 
-    order by a.modify_time des,a.apply_tim desc
+    <select id="reviewedApplicationList" resultMap="BaseResultMap">
+        SELECT a.*,b.name company_name,c.nickname create_name
+        FROM application_form a,company b,member c
+        WHERE a.apply_company=b.id AND a.apply_on=c.id
+        and a.is_delete=0 and a.approver = #{userid}
+        and a.status=0
+        <if test="keyword!=null and keyword!=''">
+            and a.code like #{keyword}
+        </if>
+        <if test="status!=null and status!=''">
+            and a.status = #{status}
+        </if>
 
-  </select>
+        order by a.modify_time des,a.apply_tim desc
 
-  <select id="reviewedApplicationList" resultMap="BaseResultMap">
-    SELECT a.*,b.name company_name,c.nickname create_name
-    FROM application_form a,company b,member c
-    WHERE a.apply_company=b.id AND a.apply_on=c.id
-    and a.is_delete=0 and a.approver = #{userid}
-    and a.status=0
-    <if test="keyword!=null and keyword!=''">
-      and a.code like #{keyword}
-    </if>
-    <if test="status!=null and status!=''">
-      and a.status = #{status}
-    </if>
+    </select>
 
-    order by a.modify_time des,a.apply_tim desc
 
-  </select>
+    <resultMap id="excelDataMap" type="com.caler.zkl.openpsd.common.ProductExcelData">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="type" property="type"/>
+        <result column="product_name" property="productName"/>
+        <result column="specifications" property="specifications"/>
+        <result column="util_name" property="unit"/>
+        <result column="price" property="price"/>
+        <result column="standard" property="standard"/>
+
+        <result column="prod_line_members" property="prodLineMembers"/>
+        <result column="safety_stock" property="safetyStock"/>
+        <result column="last_month_quantity" property="lastMonthQuantity"/>
+        <result column="on_hand_inventory" property="onHandInventory"/>
+        <result column="reported_quantity" property="reportedQuantity"/>
+        <result column="purchase_method" property="purchaseMethod"/>
+    </resultMap>
+
+    <select id="getExcelData" resultMap="excelDataMap">
+        SELECT CONCAT(b.type_name,'(',b1.type_name,')') TYPE, a.product_name,a.specifications,c.util_name,a.price,
+        a.standard,d.safety_stock,d.last_month_quantity ,d.on_hand_inventory,d.reported_quantity,f.name purchase_method,
+        d.prod_line_members
+        FROM application_form t
+        RIGHT JOIN application_product a ON t.id=a.mainid
+        LEFT JOIN product_type b ON a.type_1 = b.id
+        LEFT JOIN product_type b1 ON a.type_2 = b1.id
+        LEFT JOIN product_util c ON a.unit=c.id
+        INNER JOIN stock d ON a.id=d.product_id
+        LEFT JOIN purchase_method f ON d.purchase_method=f.id
+        WHERE a.is_delete=0 AND a.status=1
+        <if test="dateS!=null and dateE!=null">
+            AND t.apply_time &gt;= #{dateS} and t.apply_time &lt;= #{dateE}
+        </if>
+        <if test="quarterS!=null and quarterE!=null">
+            AND t.apply_time &gt;= #{quarterS} and t.apply_time &lt;= #{quarterE}
+        </if>
+        <if test="yearS!=null and yearE!=null ">
+            AND t.apply_time &gt;= #{yearS} and t.apply_time &lt;= #{yearE}
+        </if>
+
+    </select>
+
+
 </mapper>

@@ -3,6 +3,7 @@ package com.caler.zkl.openpsd.controller;
 import com.caler.zkl.openpsd.bean.Application;
 import com.caler.zkl.openpsd.common.CommonPage;
 import com.caler.zkl.openpsd.common.CommonResult;
+import com.caler.zkl.openpsd.common.ProductExcelData;
 import com.caler.zkl.openpsd.service.ApplicationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,7 +44,26 @@ public class ApplicationController {
     }
 
     /**
-     * 修改
+     * 完成:修改状态为2
+     */
+    @PostMapping("/finish")
+    @ApiOperation("完成物品申请单")
+    public CommonResult finish(@RequestBody Application application) {
+        return CommonResult.success(applicationService.finish(application) > 0 ? true : false);
+    }
+
+    /**
+     * 取消：修改状态为0
+     */
+    @PostMapping("/cancel/{id}")
+    @ApiOperation("撤销物品申请单")
+    public CommonResult cancel(@PathVariable("id") Long id) {
+        return CommonResult.success(applicationService.cancel(id) > 0 ? true : false);
+    }
+
+
+    /**
+     * 修改  修改当前申请单
      */
     @PostMapping("/update")
     @ApiOperation("修改物品申请单")
@@ -52,7 +72,7 @@ public class ApplicationController {
     }
 
     /**
-     * 批量修改状态
+     * 批量修改提交申请：修改状态为1
      */
     @PostMapping("/updateStatus")
     @ApiOperation("批量修改状态")
@@ -117,8 +137,8 @@ public class ApplicationController {
     @PostMapping("/myApplicationList")
     @ApiOperation("查询条件查询物品申请单")
     public CommonResult myApplicationList(@RequestParam(value = "keyword", required = false) String keyword,
-                             @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize,
-                             @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum) {
+                                          @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize,
+                                          @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum) {
         List<Application> applicationList = applicationService.myApplicationList(keyword, pageSize, pageNum);
         return CommonResult.success(CommonPage.restPage(applicationList));
 
@@ -130,8 +150,8 @@ public class ApplicationController {
     @PostMapping("/reviewedApplicationList")
     @ApiOperation("查询条件查询物品申请单")
     public CommonResult reviewedApplicationList(@RequestParam(value = "keyword", required = false) String keyword,
-                               @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize,
-                               @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum) {
+                                                @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize,
+                                                @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum) {
         List<Application> applicationList = applicationService.reviewedApplicationList(keyword, pageSize, pageNum);
         return CommonResult.success(CommonPage.restPage(applicationList));
 
@@ -142,9 +162,27 @@ public class ApplicationController {
      */
     @PostMapping("/applyFormNo")
     @ApiOperation("生成申请单单号")
-    public CommonResult getFormNo(){
+    public CommonResult getFormNo() {
         String formNo = applicationService.generateFormNo();
         return CommonResult.success(formNo);
+
+    }
+
+
+    /**
+     * 生成申请单单号
+     */
+    @PostMapping("/selectExcelData")
+    @ApiOperation("查询导出物品列表")
+    public CommonResult select(@RequestParam(value = "quarter", required = false) String quarter,
+                               @RequestParam(value = "date[]", required = false) String[] date,
+                               @RequestParam(value = "year", required = false) String year,
+                               @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize,
+                               @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum) {
+
+                List<ProductExcelData> productExcelDatas  = applicationService.getExcelDataList(date,quarter,year,pageSize,pageNum);
+        return CommonResult.success(CommonPage.restPage(productExcelDatas));
+
 
     }
 
