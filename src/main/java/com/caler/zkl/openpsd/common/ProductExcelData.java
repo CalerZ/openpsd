@@ -16,6 +16,7 @@ public class ProductExcelData {
     @ExcelColumn(value = "类型", col = 2)
     private String type;
 
+
     @ExcelColumn(value = "物品名称", col = 3)
     private String productName;
 
@@ -48,5 +49,18 @@ public class ProductExcelData {
 
     @ExcelColumn(value = "采购方式", col = 13)
     private String purchaseMethod;
+
+    @ExcelColumn(value = "类型1", col = 14)
+    private String type1;
+
+    @ExcelColumn(value = "类型2", col = 15)
+    private String type2;
+
+    @ExcelColumn(value = "供应商", col = 16)
+    private String suppliers;
+
+    @ExcelColumn(value = "状态", col = 17)
+    private String status;
+
 
 }

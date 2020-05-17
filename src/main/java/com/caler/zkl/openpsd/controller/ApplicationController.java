@@ -1,10 +1,13 @@
 package com.caler.zkl.openpsd.controller;
 
 import com.caler.zkl.openpsd.bean.Application;
+import com.caler.zkl.openpsd.bean.ApplicationBean;
+import com.caler.zkl.openpsd.bean.ApplicationFormBean;
 import com.caler.zkl.openpsd.common.CommonPage;
 import com.caler.zkl.openpsd.common.CommonResult;
 import com.caler.zkl.openpsd.common.ProductExcelData;
 import com.caler.zkl.openpsd.service.ApplicationService;
+import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,8 +105,8 @@ public class ApplicationController {
     @GetMapping("/{id}")
     @ApiOperation("查询单个物品申请单")
     public CommonResult list(@PathVariable("id") Long id) {
-        Application application = applicationService.list(id);
-        return CommonResult.success(application);
+        ApplicationBean applicationBean = applicationService.list(id);
+        return CommonResult.success(applicationBean);
     }
 
 
@@ -122,11 +125,11 @@ public class ApplicationController {
      * 查询所有的申请单
      */
     @PostMapping("/list")
-    @ApiOperation("查询条件查询物品申请单")
+    @ApiOperation("查询所有的申请单")
     public CommonResult list(@RequestParam(value = "keyword", required = false) String keyword,
                              @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize,
                              @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum) {
-        List<Application> applicationList = applicationService.list(keyword, pageSize, pageNum);
+        List<ApplicationFormBean> applicationList = applicationService.list(keyword, pageSize, pageNum);
         return CommonResult.success(CommonPage.restPage(applicationList));
 
     }
@@ -135,12 +138,12 @@ public class ApplicationController {
      * 我提交的申请单
      */
     @PostMapping("/myApplicationList")
-    @ApiOperation("查询条件查询物品申请单")
+    @ApiOperation("我提交的申请单")
     public CommonResult myApplicationList(@RequestParam(value = "keyword", required = false) String keyword,
                                           @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize,
                                           @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum) {
-        List<Application> applicationList = applicationService.myApplicationList(keyword, pageSize, pageNum);
-        return CommonResult.success(CommonPage.restPage(applicationList));
+        List<ApplicationFormBean> applicationPageInfo = applicationService.myApplicationList(keyword, pageSize, pageNum);
+        return CommonResult.success(CommonPage.restPage(applicationPageInfo));
 
     }
 
@@ -148,14 +151,29 @@ public class ApplicationController {
      * 待审核列表
      */
     @PostMapping("/reviewedApplicationList")
-    @ApiOperation("查询条件查询物品申请单")
+    @ApiOperation("待审核列表")
     public CommonResult reviewedApplicationList(@RequestParam(value = "keyword", required = false) String keyword,
                                                 @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize,
                                                 @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum) {
-        List<Application> applicationList = applicationService.reviewedApplicationList(keyword, pageSize, pageNum);
-        return CommonResult.success(CommonPage.restPage(applicationList));
+        List<ApplicationFormBean> applicationPageInfo = applicationService.reviewedApplicationList(keyword, pageSize, pageNum);
+        return CommonResult.success(CommonPage.restPage(applicationPageInfo));
 
     }
+
+    /**
+     * 审核记录列表
+     */
+    @PostMapping("/finishApplicationList")
+    @ApiOperation("查询审核通过记录列表")
+    public CommonResult finishApplicationList(@RequestParam(value = "keyword", required = false) String keyword,
+                                              @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize,
+                                              @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum) {
+        List<ApplicationFormBean> applicationPageInfo = applicationService.finishApplicationList(keyword, pageSize, pageNum);
+        return CommonResult.success(CommonPage.restPage(applicationPageInfo));
+
+    }
+
+
 
     /**
      * 生成申请单单号
@@ -180,7 +198,7 @@ public class ApplicationController {
                                @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize,
                                @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum) {
 
-                List<ProductExcelData> productExcelDatas  = applicationService.getExcelDataList(date,quarter,year,pageSize,pageNum);
+        List<ProductExcelData> productExcelDatas = applicationService.getExcelDataList(date, quarter, year, pageSize, pageNum);
         return CommonResult.success(CommonPage.restPage(productExcelDatas));
 
 

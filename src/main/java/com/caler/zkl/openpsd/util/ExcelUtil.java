@@ -323,7 +323,7 @@ public class ExcelUtil {
      * @param response
      */
 
-    private static void buildExcelDocument(String fileName, Workbook wb, HttpServletResponse response) {
+    public static void buildExcelDocument(String fileName, Workbook wb, HttpServletResponse response) {
         try {
             response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
             response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "utf-8"));
@@ -340,7 +340,7 @@ public class ExcelUtil {
      * @param path 生成excel路径
      * @param wb
      */
-    private static void buildExcelFile(String path, Workbook wb) {
+    public static void buildExcelFile(String path, Workbook wb) {
 
         File file = new File(path);
         if (file.exists()) {

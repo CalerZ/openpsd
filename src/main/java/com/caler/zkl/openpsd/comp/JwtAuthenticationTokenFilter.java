@@ -50,14 +50,14 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader(this.tokenHeader);
         //系统模块用户是管理员才可以访问
-        String sysPath = "";
-        PathMatcher pathMatcher = new AntPathMatcher();
-        for (String path : systemCtlConfig.getUrls()) {
-            if (pathMatcher.match(path, request.getRequestURI())) {
-                authHeader = request.getParameter("token");
-                sysPath = path;
-            }
-        }
+//        String sysPath = "";
+//        PathMatcher pathMatcher = new AntPathMatcher();
+//        for (String path : systemCtlConfig.getUrls()) {
+//            if (pathMatcher.match(path, request.getRequestURI())) {
+//                authHeader = request.getParameter("token");
+//                sysPath = path;
+//            }
+//        }
 
 
         if (authHeader != null && authHeader.startsWith(this.tokenHead)) {
@@ -65,9 +65,9 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             String username = jwtTokenUtil.getUserNameFromToken(authToken);
             LOGGER.info("checking username:{}", username);
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                if(!"admin".equals(username)&&systemCtlConfig.getUrls().contains(sysPath)){
+               /* if(!"admin".equals(username)&&systemCtlConfig.getUrls().contains(sysPath)){
                     throw  new AccessDeniedException("系统信息非管理员不可查看！");
-                }
+                }*/
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
                 if (jwtTokenUtil.validateToken(authToken, userDetails)) {
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

@@ -22,7 +22,7 @@ import java.util.List;
 public class ProductController {
 
     @Autowired
-    private ProductService memberService;
+    private ProductService productService;
 
     /**
      * 添加
@@ -30,7 +30,7 @@ public class ProductController {
     @PostMapping("/insert")
     @ApiOperation("添加物品")
     public CommonResult create(@RequestBody ProductDetail productDetail){
-        return CommonResult.success(memberService.create(productDetail)>0?true:false);
+        return CommonResult.success(productService.create(productDetail)>0?true:false);
     }
 
     /**
@@ -39,7 +39,7 @@ public class ProductController {
     @PutMapping("/update")
     @ApiOperation("修改物品")
     public CommonResult update(@RequestBody  ProductDetail productDetail){
-        return CommonResult.success(memberService.update(productDetail)>0?true:false);
+        return CommonResult.success(productService.update(productDetail)>0?true:false);
     }
 
     /**
@@ -48,7 +48,7 @@ public class ProductController {
     @DeleteMapping("/delete")
     @ApiOperation("批量删除物品")
     public CommonResult delete(@RequestBody List<Long> ids){
-        return CommonResult.success(memberService.delete(ids)>0?true:false);
+        return CommonResult.success(productService.delete(ids)>0?true:false);
     }
     /**
      * 批量删除
@@ -56,7 +56,7 @@ public class ProductController {
     @DeleteMapping("/delete/{id}")
     @ApiOperation("批量删除物品")
     public CommonResult delete(@PathVariable("id") Long id){
-        return CommonResult.success(memberService.delete(id)>0?true:false);
+        return CommonResult.success(productService.delete(id)>0?true:false);
     }
 
 
@@ -67,7 +67,7 @@ public class ProductController {
     @GetMapping("/{id}")
     @ApiOperation("查询单个物品")
     public CommonResult list(@PathVariable("id") Long id){
-        ProductDetail productDetail = memberService.list(id);
+        ProductDetail productDetail = productService.list(id);
         return CommonResult.success(productDetail);
     }
 
@@ -78,7 +78,7 @@ public class ProductController {
     @GetMapping("/list")
     @ApiOperation("查询所有物品")
     public CommonResult list(){
-        List<Product> list = memberService.list();
+        List<Product> list = productService.list();
         return CommonResult.success(list);
     }
 
@@ -94,7 +94,7 @@ public class ProductController {
                              @RequestParam(value = "createrid",required = false) Long createrid,
                              @RequestParam(value = "pageSize",required = true,defaultValue = "10") Integer pageSize,
                              @RequestParam(value = "pageNum",required = true,defaultValue = "1") Integer pageNum){
-        List<ProductBean> memberList = memberService.list(keyword,typeid,status,createrid, pageSize, pageNum);
+        List<ProductBean> memberList = productService.list(keyword,typeid,status,createrid, pageSize, pageNum);
         return CommonResult.success(CommonPage.restPage(memberList));
 
     }
@@ -109,7 +109,7 @@ public class ProductController {
                              @RequestParam(value = "createrid",required = false) Long createrid,
                              @RequestParam(value = "pageSize",required = true,defaultValue = "10") Integer pageSize,
                              @RequestParam(value = "pageNum",required = true,defaultValue = "1") Integer pageNum){
-        List<ProductBean> memberList = memberService.list(keyword,typeid,1,createrid, pageSize, pageNum);
+        List<ProductBean> memberList = productService.list(keyword,typeid,1,createrid, pageSize, pageNum);
         return CommonResult.success(CommonPage.restPage(memberList));
 
     }
@@ -122,7 +122,7 @@ public class ProductController {
     @GetMapping("/purchaseMethod")
     @ApiOperation("查询所有采购方式")
     public CommonResult purchaseMethodlist(){
-        List<PurchaseMethod> list = memberService.purchaseMethodlist();
+        List<PurchaseMethod> list = productService.purchaseMethodlist();
         return CommonResult.success(list);
     }
 
@@ -132,7 +132,7 @@ public class ProductController {
     @PostMapping("/applicationProductList")
     @ApiOperation("查询所有物品封装为applicationProduct")
     public CommonResult applicationProductList(@RequestBody  List<Long> ids){
-        List<ApplicationProduct> list = memberService.applicationProductList(ids);
+        List<ApplicationProduct> list = productService.applicationProductList(ids);
         return CommonResult.success(list);
     }
 
@@ -143,7 +143,7 @@ public class ProductController {
     @ApiOperation("获取物料编码")
     public CommonResult getProductNo(@RequestParam(value = "type1",required = true) Long type1,
                                      @RequestParam(value = "type2",required = true) Long type2){
-        String productNo = memberService.getProductNo(type1,type2);
+        String productNo = productService.getProductNo(type1,type2);
         return CommonResult.success(productNo);
     }
 

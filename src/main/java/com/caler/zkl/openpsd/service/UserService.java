@@ -14,4 +14,5 @@ public interface UserService  extends UserDetailsService {
     String refreshToken(String token);
 
     User selectByName(String username);
+    User selectUserByName(String username);
 }

@@ -10,6 +10,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @Configuration
 @EnableTransactionManagement
-@MapperScan({"com.caler.zkl.openpsd.mapper"})
+@MapperScan({"com.caler.zkl.openpsd.mapper","com.caler.zkl.openpsd.dao"})
 public class MyBatisConfig {
 }

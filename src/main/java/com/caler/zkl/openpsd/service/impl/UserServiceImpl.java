@@ -94,19 +94,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public com.caler.zkl.openpsd.bean.User selectByName(String username) {
-        if(username==null||"".equals(username)){
+        if (username == null || "".equals(username)) {
             throw new BadCredentialsException("用户名为空");
         }
         com.caler.zkl.openpsd.bean.User user = new com.caler.zkl.openpsd.bean.User();
-        if("admin".equals(username)){//admin管理员拥有所有角色，菜单，资源，权限
+        if ("admin".equals(username)) {//admin管理员拥有所有角色，菜单，资源，权限
             user = userMapper.selectByName(username);
             user.setRoles(roleService.list());
             user.setMenues(menuService.list());
             user.setResources(resourceService.list());
             user.setPermissions(permissionService.list());
-        }else{
+        } else {
             user = userMapper.selectByName(username);
         }
+        return user;
+    }
+
+    @Override
+    public com.caler.zkl.openpsd.bean.User selectUserByName(String username) {
+        if (username == null || "".equals(username)) {
+            throw new BadCredentialsException("用户名为空");
+        }
+        com.caler.zkl.openpsd.bean.User user = new com.caler.zkl.openpsd.bean.User();
+        user = userMapper.selectByName(username);
         return user;
     }
 
@@ -133,7 +143,6 @@ public class UserServiceImpl implements UserService {
     public void updateLastLoginTime(String username) {
         memberService.updateLastLoginTime(username);
     }
-
 
 
 }

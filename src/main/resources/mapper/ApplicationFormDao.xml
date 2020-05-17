@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.caler.zkl.openpsd.mapper.ApplicationFormDao">
-    <resultMap id="BaseResultMap" type="com.caler.zkl.openpsd.bean.applicationFormBean">
+    <resultMap id="BaseResultMap" type="com.caler.zkl.openpsd.bean.ApplicationFormBean">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="form_code" jdbcType="VARCHAR" property="formCode"/>
         <result column="apply_company" jdbcType="BIGINT" property="applyCompany"/>
@@ -15,7 +15,11 @@
         <result column="description" jdbcType="LONGVARCHAR" property="description"/>
         <result column="company_name" property="companyName"/>
         <result column="create_name" property="createrName"/>
+        <result column="approver_name" property="approverName"/>
     </resultMap>
+
+
+
 
     <select id="list" resultMap="BaseResultMap">
         SELECT a.*,b.name company_name,c.nickname create_name
@@ -25,9 +29,9 @@
             and a.code like #{keyword}
         </if>
         <if test="status!=null and status!=''">
-            and a.status = #{status}
+            and a.apply_status = #{status}
         </if>
-        order by a.modify_time des,a.apply_tim desc
+        order by a.apply_time desc,a.modify_time desc
     </select>
 
     <select id="myApplicationList" resultMap="BaseResultMap">
@@ -38,11 +42,9 @@
             and a.code like #{keyword}
         </if>
         <if test="status!=null and status!=''">
-            and a.status = #{status}
+            and a.apply_status = #{status}
         </if>
-
-        order by a.modify_time des,a.apply_tim desc
-
+        order by a.apply_time desc,a.modify_time desc
     </select>
 
     <select id="reviewedApplicationList" resultMap="BaseResultMap">
@@ -50,16 +52,23 @@
         FROM application_form a,company b,member c
         WHERE a.apply_company=b.id AND a.apply_on=c.id
         and a.is_delete=0 and a.approver = #{userid}
-        and a.status=0
+        and a.apply_status=1
         <if test="keyword!=null and keyword!=''">
             and a.code like #{keyword}
         </if>
-        <if test="status!=null and status!=''">
-            and a.status = #{status}
+        order by a.apply_time desc,a.modify_time desc
+    </select>
+
+    <select id="finishApplicationList" resultMap="BaseResultMap">
+        SELECT a.*,b.name company_name,c.nickname create_name
+        FROM application_form a,company b,member c
+        WHERE a.apply_company=b.id AND a.apply_on=c.id
+        and a.is_delete=0 and a.approver = #{userid}
+        and a.apply_status=2
+        <if test="keyword!=null and keyword!=''">
+            and a.code like #{keyword}
         </if>
-
-        order by a.modify_time des,a.apply_tim desc
-
+        order by a.apply_time desc,a.modify_time desc
     </select>
 
 
@@ -101,6 +110,79 @@
         <if test="yearS!=null and yearE!=null ">
             AND t.apply_time &gt;= #{yearS} and t.apply_time &lt;= #{yearE}
         </if>
+
+    </select>
+
+
+    <resultMap id="ApplicatonBeanResultMap" type="com.caler.zkl.openpsd.bean.ApplicationBean">
+        <association property="applicationForm" javaType="com.caler.zkl.openpsd.bean.ApplicationFormBean" column="id"
+                     select="selectOneForm">
+        </association>
+        <collection property="applicationProducts" javaType="com.caler.zkl.openpsd.bean.ApplicationProductBean"
+                    column="id" select="selectFormProduct" ofType="java.util.ArrayList">
+        </collection>
+    </resultMap>
+
+    <resultMap id="ApplicationProductBeanResultMap" type="com.caler.zkl.openpsd.bean.ApplicationProductBean">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="product_id" jdbcType="BIGINT" property="productId"/>
+        <result column="product_code" jdbcType="VARCHAR" property="productCode"/>
+        <result column="type_1" jdbcType="BIGINT" property="type1"/>
+        <result column="type_2" jdbcType="BIGINT" property="type2"/>
+        <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+        <result column="mainid" jdbcType="BIGINT" property="mainid"/>
+        <result column="specifications" jdbcType="VARCHAR" property="specifications"/>
+        <result column="unit" jdbcType="BIGINT" property="unit"/>
+        <result column="price" jdbcType="DOUBLE" property="price"/>
+        <result column="standard" jdbcType="VARCHAR" property="standard"/>
+        <result column="supplier_id" jdbcType="BIGINT" property="supplierId"/>
+        <result column="safety_stock" jdbcType="DOUBLE" property="safetyStock"/>
+        <result column="last_month_quantity" jdbcType="DOUBLE" property="lastMonthQuantity"/>
+        <result column="on_hand_inventory" jdbcType="DOUBLE" property="onHandInventory"/>
+        <result column="reported_quantity" jdbcType="DOUBLE" property="reportedQuantity"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="is_delete" jdbcType="INTEGER" property="isDelete"/>
+        <result column="record_time" jdbcType="TIMESTAMP" property="recordTime"/>
+        <result column="record_on" jdbcType="BIGINT" property="recordOn"/>
+        <result column="purchase_method" jdbcType="BIGINT" property="purchaseMethod"/>
+        <result column="prod_line_members" jdbcType="INTEGER" property="prodLineMembers"/>
+        <result column="description" jdbcType="LONGVARCHAR" property="description"/>
+        <result column="note" jdbcType="LONGVARCHAR" property="note"/>
+
+
+        <result column="type_1_name" jdbcType="VARCHAR" property="type1Name"/>
+        <result column="type_2_name" jdbcType="VARCHAR" property="type2Name"/>
+        <result column="util_name" jdbcType="VARCHAR" property="unitName"/>
+        <result column="record_on_name" jdbcType="VARCHAR" property="supplierName"/>
+        <result column="supplier_name" jdbcType="VARCHAR" property="recordOnName"/>
+        <result column="purchase_method_name" jdbcType="VARCHAR" property="purchaseMethodName"/>
+    </resultMap>
+
+
+    <select id="selectOneForm" resultMap="BaseResultMap">
+        SELECT a.*,b.name company_name,c.nickname create_name,d.nickname approver_name
+        FROM application_form a,company b,member c,member d
+        WHERE a.apply_company=b.id AND a.apply_on=c.id and a.is_delete=0 and a.approver=d.id and a.id=#{id}
+    </select>
+
+    <select id="selectOneApplication" resultMap="ApplicatonBeanResultMap">
+        select * from application_form where id = #{id}
+
+    </select>
+
+    <select id="selectFormProduct" resultMap="ApplicationProductBeanResultMap">
+        SELECT a.*,
+        b.type_name type_1_name , b1.type_name type_2_name , c.util_name, d.username record_on_name,e.name supplier_name,f.name purchase_method_name
+        FROM
+        application_product a
+        INNER JOIN product_type b ON a.type_1=b.id
+        LEFT JOIN product_type b1 ON a.type_2=b1.id
+        INNER JOIN product_util c ON a.unit = c.id
+        INNER JOIN member d ON a.record_on = d.id
+        LEFT JOIN supplier e ON a.supplier_id = e.id
+        LEFT JOIN purchase_method f ON a.purchase_method = f.id
+        WHERE a.is_delete=0 AND a.is_delete=0 and a.mainid=#{id}
 
     </select>
 

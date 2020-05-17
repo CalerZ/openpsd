@@ -48,7 +48,7 @@ public class UserServiceUtil {
     }
     @ConditionalOnBean(SecurityContext.class)
     public  User getUser() {
-        return userService.selectByName(getUserName());
+        return userService.selectUserByName(getUserName());
 
     }
 }

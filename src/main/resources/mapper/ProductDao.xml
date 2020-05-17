@@ -29,13 +29,15 @@
 
 
     <select id="select" resultMap="BaseResultMap">
-        SELECT a.id , a.NAME , a.type_1 , a.type_2 , a.description , a.specifications , a.unit , a.price , a.standard , a.STATUS , a.create_time , a.create_on , a.modify_time , a.modify_on , a.supplier_id , a.is_delete , a.CODE , b.type_name type_1_name , b1.type_name type_2_name , c.util_name, d.username
+        SELECT a.id , a.NAME , a.type_1 , a.type_2 , a.description , a.specifications , a.unit , a.price , a.standard ,
+        a.STATUS , a.create_time , a.create_on , a.modify_time , a.modify_on , a.supplier_id , a.is_delete , a.CODE ,
+        b.type_name type_1_name , b1.type_name type_2_name , c.util_name, d.username
         FROM
-        product                  a
-        INNER JOIN  product_type b  ON a.type_1=b.id
-        INNER JOIN  product_type b1 ON a.type_2=b1.id
-        INNER JOIN  product_util c  ON a.unit = c.id
-        INNER JOIN  member 	     d  ON a.create_on = d.id
+        product a
+        INNER JOIN product_type b ON a.type_1=b.id
+        INNER JOIN product_type b1 ON a.type_2=b1.id
+        INNER JOIN product_util c ON a.unit = c.id
+        INNER JOIN member d ON a.create_on = d.id
         WHERE a.is_delete=0
         <if test="keyword!=null and keyword!=''">
             and ( a.name like '%'+#{keyword}+'%' or a.code like '%'+#{keyword}+'%' )
@@ -58,4 +60,39 @@
     </select>
 
 
+    <resultMap id="BaseResultMapPojo" type="com.caler.zkl.openpsd.bean.ProductPojo">
+        <association property="product" javaType="com.caler.zkl.openpsd.bean.Product" column="id"
+                     select="com.caler.zkl.openpsd.mapper.ProductMapper.selectByPrimaryKey" ></association>
+        <association property="productType1" javaType="com.caler.zkl.openpsd.bean.ProductType" column="type_1"
+                     select="com.caler.zkl.openpsd.mapper.ProductTypeMapper.selectByPrimaryKey" ></association>
+        <association property="productType2" javaType="com.caler.zkl.openpsd.bean.ProductType" column="type_2"
+                     select="com.caler.zkl.openpsd.mapper.ProductTypeMapper.selectByPrimaryKey" ></association>
+        <association property="productUtil" javaType="com.caler.zkl.openpsd.bean.ProductUtil" column="util"
+                     select="com.caler.zkl.openpsd.mapper.ProductUtilMapper.selectByPrimaryKey" ></association>
+        <association property="stock" javaType="com.caler.zkl.openpsd.bean.Stock" column="id"
+                     select="com.caler.zkl.openpsd.mapper.ProductDao.selectStockByProductId" ></association>
+        <association property="member" javaType="com.caler.zkl.openpsd.bean.Member" column="create_on"
+                     select="com.caler.zkl.openpsd.mapper.MemberMapper.selectByPrimaryKey" ></association>
+        <association property="purchaseMethod" javaType="com.caler.zkl.openpsd.bean.PurchaseMethod" column="purchase_method"
+                     select="com.caler.zkl.openpsd.mapper.PurchaseMethodMapper.selectByPrimaryKey" ></association>
+        <collection property="supplierList" javaType="java.util.ArrayList"  ofType="com.caler.zkl.openpsd.bean.Supplier"
+                    column="id" select="com.caler.zkl.openpsd.mapper.ProductDao.selectSupplierByProductId"></collection>
+    </resultMap>
+
+
+    <!--查询单个物料-->
+    <select id="selectPojo" resultMap="BaseResultMapPojo">
+        SELECT p.id,p.type_1,p.type2,p.util,p.create_on,s.purchase_method FROM product p INNER JOIN stock s ON p.id =s.product_id WHERE p.id =#{id}
+
+    </select>
+
+    <select id="selectStockByProductId" resultType="com.caler.zkl.openpsd.bean.Stock">
+        SELECT * FROM  stock WHERE product_id=#{pid}
+
+    </select>
+
+    <select id="selectSupplierByProductId" resultType="com.caler.zkl.openpsd.bean.Supplier">
+        SELECT s.* FROM  product_supplier p inner join supplier s on p.supplier_id =s.id WHERE p.product_id=#{pid}
+
+    </select>
 </mapper>

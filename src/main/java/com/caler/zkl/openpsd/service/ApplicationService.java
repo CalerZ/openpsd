@@ -2,7 +2,10 @@ package com.caler.zkl.openpsd.service;
 
 
 import com.caler.zkl.openpsd.bean.Application;
+import com.caler.zkl.openpsd.bean.ApplicationBean;
+import com.caler.zkl.openpsd.bean.ApplicationFormBean;
 import com.caler.zkl.openpsd.common.ProductExcelData;
+import com.github.pagehelper.PageInfo;
 
 import java.util.List;
 
@@ -27,10 +30,11 @@ public interface ApplicationService {
     int delete(List<Long> ids);
 
     int delete(Long id);
+
     /**
      * 查询单个
      */
-    Application list(Long id);
+    ApplicationBean list(Long id);
 
     /**
      * 查询所有
@@ -40,12 +44,14 @@ public interface ApplicationService {
     /**
      * 条件分页查询
      */
-    List<Application> list(String keyword, Integer pageSize, Integer pageNum);
+    List<ApplicationFormBean> list(String keyword, Integer pageSize, Integer pageNum);
 
 
-    List<Application> myApplicationList(String keyword, Integer pageSize, Integer pageNum);
+    List<ApplicationFormBean> myApplicationList(String keyword, Integer pageSize, Integer pageNum);
 
-    List<Application> reviewedApplicationList(String keyword, Integer pageSize, Integer pageNum);
+    List<ApplicationFormBean> reviewedApplicationList(String keyword, Integer pageSize, Integer pageNum);
+
+    List<ApplicationFormBean> finishApplicationList(String keyword, Integer pageSize, Integer pageNum);
 
     int submit(Application application);
 
@@ -57,7 +63,7 @@ public interface ApplicationService {
 
     List<ProductExcelData> getExcelDataList(String[] date, String quarter, String year, Integer pageSize, Integer pageNum);
 
-    int finish(Application application);
+    int finish(Application applicationBean);
 
     int cancel(Long id);
 }

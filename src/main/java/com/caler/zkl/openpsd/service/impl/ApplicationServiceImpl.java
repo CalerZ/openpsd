@@ -1,6 +1,8 @@
 package com.caler.zkl.openpsd.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.caler.zkl.openpsd.bean.*;
+import com.caler.zkl.openpsd.common.CommonPage;
 import com.caler.zkl.openpsd.common.ProductExcelData;
 import com.caler.zkl.openpsd.mapper.ApplicationFormDao;
 import com.caler.zkl.openpsd.mapper.ApplicationFormMapper;
@@ -9,11 +11,13 @@ import com.caler.zkl.openpsd.mapper.SysDictMapper;
 import com.caler.zkl.openpsd.service.ApplicationService;
 import com.caler.zkl.openpsd.util.UserServiceUtil;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,6 +49,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Transactional
     public int create(Application application) {
 
+
         ReentrantLock lock = new ReentrantLock();
         try {
             lock.lock();
@@ -53,6 +58,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             ApplicationForm applicationForm = application.getApplicationForm();
             applicationForm.setApplyTime(new Date());
             applicationForm.setIsDelete(0);
+            applicationForm.setApplyStatus(0);
             applicationForm.setApplyOn(applicationForm.getApplyOn() == null ? userServiceUtil.getUser().getId() : applicationForm.getApplyOn());
             count = applicationFormMapper.insertSelective(applicationForm);
             //流水号更新
@@ -76,6 +82,12 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
     }
 
+    private void copyProperties(ApplicationBean applicationBean, Application application) {
+
+        BeanUtil.copyProperties(applicationBean.getApplicationForm(), application.getApplicationForm());
+        BeanUtil.copyProperties(applicationBean.getApplicationProducts(), application.getApplicationProducts());
+    }
+
     @Override
     @Transactional
     public int submit(Application application) {
@@ -87,7 +99,8 @@ public class ApplicationServiceImpl implements ApplicationService {
             int count = 0;
             ApplicationForm applicationForm = application.getApplicationForm();
             applicationForm.setApplyTime(new Date());
-            applicationForm.setIsDelete(1);
+            applicationForm.setIsDelete(0);
+            applicationForm.setApplyStatus(1);
             applicationForm.setApplyOn(applicationForm.getApplyOn() == null ? userServiceUtil.getUser().getId() : applicationForm.getApplyOn());
             count = applicationFormMapper.insertSelective(applicationForm);
             //流水号更新
@@ -111,10 +124,10 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
     }
 
-
     @Override
     @Transactional
     public int update(Application application) {
+
         int count = 0;
         ApplicationForm applicationForm = application.getApplicationForm();
         applicationForm.setModifyTime(new Date());
@@ -156,18 +169,18 @@ public class ApplicationServiceImpl implements ApplicationService {
         applicationProduct.setIsDelete(1);
         ApplicationProductExample example = new ApplicationProductExample();
         example.createCriteria().andMainidEqualTo(id);
-        applicationProductMapper.updateByExample(applicationProduct, example);
+        applicationProductMapper.updateByExampleSelective(applicationProduct, example);
         return count;
     }
 
     @Override
-    public Application list(Long id) {
-        Application application = new Application();
-        application.setApplicationForm(applicationFormMapper.selectByPrimaryKey(id));
-        ApplicationProductExample example = new ApplicationProductExample();
-        example.createCriteria().andMainidEqualTo(id);
-        application.setApplicationProducts(applicationProductMapper.selectByExample(example));
-        return application;
+    public ApplicationBean list(Long id) {
+        ApplicationBean applicationBean = new ApplicationBean();
+        ApplicationFormBean applicationFormBean = applicationFormDao.selectOneForm(id);
+        List<ApplicationProductBean> applicationProductBeans = applicationFormDao.selectFormProduct(id);
+        applicationBean.setApplicationForm(applicationFormBean);
+        applicationBean.setApplicationProducts(applicationProductBeans);
+        return applicationBean;
     }
 
     @Override
@@ -181,41 +194,35 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<Application> list(String keyword, Integer pageSize, Integer pageNum) {
+    public List<ApplicationFormBean> list(String keyword, Integer pageSize, Integer pageNum) {
+        Long userid = userServiceUtil.getUser().getId();
         PageHelper.startPage(pageNum, pageSize);
-        ApplicationFormExample example = new ApplicationFormExample();
-        example.createCriteria().andIsDeleteEqualTo(0);
-        return applicationFormMapper.selectByExample(example).stream().map(item -> {
-            Application application = new Application();
-            application.setApplicationForm(item);
-            return application;
-        }).collect(Collectors.toList());
+        List<ApplicationFormBean> list = applicationFormDao.myApplicationList(keyword, null, userid);
+        return list;
     }
 
     @Override
-    public List<Application> myApplicationList(String keyword, Integer pageSize, Integer pageNum) {
+    public List<ApplicationFormBean> myApplicationList(String keyword, Integer pageSize, Integer pageNum) {
+
+        Long userid = userServiceUtil.getUser().getId();
         PageHelper.startPage(pageNum, pageSize);
-        ApplicationFormExample example = new ApplicationFormExample();
-        example.createCriteria().andApplyOnEqualTo(userServiceUtil.getUser().getId()).andIsDeleteEqualTo(0);
-        return applicationFormMapper.selectByExample(example).stream().map(item -> {
-            Application application = new Application();
-            application.setApplicationForm(item);
-            return application;
-        }).collect(Collectors.toList());
+        List<ApplicationFormBean> list = applicationFormDao.myApplicationList(keyword, null, userid);
+        return list;
     }
 
-    public List<Application> reviewedApplicationList(String keyword, Integer pageSize, Integer pageNum) {
+    public List<ApplicationFormBean> reviewedApplicationList(String keyword, Integer pageSize, Integer pageNum) {
+        Long userid = userServiceUtil.getUser().getId();
         PageHelper.startPage(pageNum, pageSize);
-        ApplicationFormExample example = new ApplicationFormExample();
-        example.createCriteria()
-                .andApproverEqualTo(userServiceUtil.getUser().getId())
-                .andApplyStatusEqualTo(1)
-                .andIsDeleteEqualTo(0);
-        return applicationFormMapper.selectByExample(example).stream().map(item -> {
-            Application application = new Application();
-            application.setApplicationForm(item);
-            return application;
-        }).collect(Collectors.toList());
+        List<ApplicationFormBean> list = applicationFormDao.reviewedApplicationList(keyword, userid);
+        return list;
+    }
+
+    @Override
+    public List<ApplicationFormBean> finishApplicationList(String keyword, Integer pageSize, Integer pageNum) {
+        Long userid = userServiceUtil.getUser().getId();
+        PageHelper.startPage(pageNum, pageSize);
+        List<ApplicationFormBean> list = applicationFormDao.finishApplicationList(keyword, userid);
+        return list;
     }
 
     @Override
@@ -342,6 +349,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     @Transactional
     public int finish(Application application) {
+
         AtomicInteger count = new AtomicInteger();
         ApplicationForm applicationForm = new ApplicationForm();
         applicationForm.setId(application.getApplicationForm().getId());
