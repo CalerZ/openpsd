@@ -29,6 +29,8 @@ secure:
       - /swagger/**
       - /**/v2/api-docs
       - /druid/**
+      - /info/*
+      - /doc.html
       - /**/*.js
       - /**/*.css
       - /**/*.png
@@ -47,7 +49,12 @@ system:
     urls:
       - /doc.html
       - /druid/sql.html
-
+swagger:
+  production: false
+  basic:
+    enable: true
+    username: admin
+    password: 123
 
 # 在默认情况下大多数Actuator的端点并没有完全公开，这里我将所有端点都进行公开进行管理
 management:

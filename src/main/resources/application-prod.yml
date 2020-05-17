@@ -33,5 +33,5 @@ spring:
             # 配置发送到SBA Server的SBA Client的端点安全密码
             user.name: ${spring.security.user.name}
             user.password: ${spring.security.user.password}
-        enabled: false
+        enabled: true
 
