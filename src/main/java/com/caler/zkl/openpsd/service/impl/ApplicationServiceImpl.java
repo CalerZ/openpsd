@@ -4,10 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.caler.zkl.openpsd.bean.*;
 import com.caler.zkl.openpsd.common.CommonPage;
 import com.caler.zkl.openpsd.common.ProductExcelData;
-import com.caler.zkl.openpsd.mapper.ApplicationFormDao;
-import com.caler.zkl.openpsd.mapper.ApplicationFormMapper;
-import com.caler.zkl.openpsd.mapper.ApplicationProductMapper;
-import com.caler.zkl.openpsd.mapper.SysDictMapper;
+import com.caler.zkl.openpsd.mapper.*;
 import com.caler.zkl.openpsd.service.ApplicationService;
 import com.caler.zkl.openpsd.util.UserServiceUtil;
 import com.github.pagehelper.PageHelper;
@@ -44,6 +41,12 @@ public class ApplicationServiceImpl implements ApplicationService {
     private SysDictMapper sysDictMapper;
     @Autowired
     private ApplicationFormDao applicationFormDao;
+
+    @Autowired
+    private SupplierMapper supplierMapper;
+
+    @Autowired
+    private ProductDao productDao;
 
     @Override
     @Transactional
@@ -174,12 +177,61 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public ApplicationBean list(Long id) {
-        ApplicationBean applicationBean = new ApplicationBean();
+    public ApplicationProductPoJo list(Long id) {
+        ApplicationProductPoJo applicationBean = new ApplicationProductPoJo();
         ApplicationFormBean applicationFormBean = applicationFormDao.selectOneForm(id);
         List<ApplicationProductBean> applicationProductBeans = applicationFormDao.selectFormProduct(id);
+        List<ProductPojo> productPojos = applicationProductBeans.stream().map(item -> {
+            ProductPojo productPojo = new ProductPojo();
+            BeanUtil.copyProperties(item,productPojo);
+
+            productPojo.setName(item.getProductName());
+            productPojo.setId(item.getId());
+            productPojo.setStatus(item.getStatus());
+            productPojo.setCode(item.getProductCode());
+            productPojo.setIsDelete(item.getIsDelete());
+
+            Member member = new Member();
+            member.setId(item.getRecordOn());
+            member.setNickname(item.getRecordOnName());
+            productPojo.setMember(member);
+
+            ProductUtil productUtil = new ProductUtil();
+            productUtil.setId(item.getUnit());
+            productUtil.setUtilName(item.getUnitName());
+            productPojo.setProductUtil(productUtil);
+
+            ProductType productType1 = new ProductType();
+            productType1.setId(item.getType1());
+            productType1.setTypeName(item.getType1Name());
+            productPojo.setProductType1(productType1);
+
+            ProductType productType2 = new ProductType();
+            productType2.setId(item.getType2());
+            productType2.setTypeName(item.getType2Name());
+            productPojo.setProductType2(productType2);
+
+            Stock stock = new Stock();
+            stock.setSafetyStock(item.getSafetyStock());
+            stock.setLastMonthQuantity(item.getLastMonthQuantity());
+            stock.setOnHandInventory(item.getOnHandInventory());
+            stock.setReportedQuantity(item.getReportedQuantity());
+            stock.setProdLineMembers(item.getProdLineMembers());
+            stock.setPurchaseMethod(item.getPurchaseMethod());
+            productPojo.setStock(stock);
+
+            PurchaseMethod purchaseMethod = new PurchaseMethod();
+            purchaseMethod.setId(item.getPurchaseMethod());
+            purchaseMethod.setName(item.getPurchaseMethodName());
+            productPojo.setPurchaseMethod(purchaseMethod);
+
+            //根据物料id获取供应商列表
+            productPojo.setSupplierList(productDao.selectSupplierByProductId(item.getProductId()));
+            return productPojo;
+        }).collect(Collectors.toList());
+
         applicationBean.setApplicationForm(applicationFormBean);
-        applicationBean.setApplicationProducts(applicationProductBeans);
+        applicationBean.setApplicationProducts(productPojos);
         return applicationBean;
     }
 

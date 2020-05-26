@@ -52,7 +52,7 @@
             and a.create_on =#{createrid}
         </if>
         order by
-        a.modify_time desc,a.create_time desc
+        id desc
     </select>
 
     <select id="selectMaxPartNo" resultType="string">
@@ -61,28 +61,45 @@
 
 
     <resultMap id="BaseResultMapPojo" type="com.caler.zkl.openpsd.bean.ProductPojo">
-        <association property="product" javaType="com.caler.zkl.openpsd.bean.Product" column="id"
-                     select="com.caler.zkl.openpsd.mapper.ProductMapper.selectByPrimaryKey" ></association>
+
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="type_1" jdbcType="BIGINT" property="type1"/>
+        <result column="type_2" jdbcType="BIGINT" property="type2"/>
+        <result column="specifications" jdbcType="VARCHAR" property="specifications"/>
+        <result column="unit" jdbcType="BIGINT" property="unit"/>
+        <result column="price" jdbcType="DOUBLE" property="price"/>
+        <result column="standard" jdbcType="VARCHAR" property="standard"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="create_time" jdbcType="VARCHAR" property="createTime"/>
+        <result column="create_on" jdbcType="BIGINT" property="createOn"/>
+        <result column="modify_time" jdbcType="VARCHAR" property="modifyTime"/>
+        <result column="modify_on" jdbcType="BIGINT" property="modifyOn"/>
+        <result column="supplier_id" jdbcType="VARCHAR" property="supplierId"/>
+        <result column="is_delete" jdbcType="INTEGER" property="isDelete"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="description" jdbcType="LONGVARCHAR" property="description"/>
+
         <association property="productType1" javaType="com.caler.zkl.openpsd.bean.ProductType" column="type_1"
                      select="com.caler.zkl.openpsd.mapper.ProductTypeMapper.selectByPrimaryKey" ></association>
         <association property="productType2" javaType="com.caler.zkl.openpsd.bean.ProductType" column="type_2"
                      select="com.caler.zkl.openpsd.mapper.ProductTypeMapper.selectByPrimaryKey" ></association>
-        <association property="productUtil" javaType="com.caler.zkl.openpsd.bean.ProductUtil" column="util"
+<!--        <association property="productUtil" javaType="com.caler.zkl.openpsd.bean.ProductUtil" column="util"
                      select="com.caler.zkl.openpsd.mapper.ProductUtilMapper.selectByPrimaryKey" ></association>
         <association property="stock" javaType="com.caler.zkl.openpsd.bean.Stock" column="id"
                      select="com.caler.zkl.openpsd.mapper.ProductDao.selectStockByProductId" ></association>
         <association property="member" javaType="com.caler.zkl.openpsd.bean.Member" column="create_on"
                      select="com.caler.zkl.openpsd.mapper.MemberMapper.selectByPrimaryKey" ></association>
         <association property="purchaseMethod" javaType="com.caler.zkl.openpsd.bean.PurchaseMethod" column="purchase_method"
-                     select="com.caler.zkl.openpsd.mapper.PurchaseMethodMapper.selectByPrimaryKey" ></association>
-        <collection property="supplierList" javaType="java.util.ArrayList"  ofType="com.caler.zkl.openpsd.bean.Supplier"
-                    column="id" select="com.caler.zkl.openpsd.mapper.ProductDao.selectSupplierByProductId"></collection>
+                     select="com.caler.zkl.openpsd.mapper.PurchaseMethodMapper.selectByPrimaryKey" ></association>-->
     </resultMap>
 
 
     <!--查询单个物料-->
-    <select id="selectPojo" resultMap="BaseResultMapPojo">
-        SELECT p.id,p.type_1,p.type2,p.util,p.create_on,s.purchase_method FROM product p INNER JOIN stock s ON p.id =s.product_id WHERE p.id =#{id}
+    <select id="selectOneProductPojo" resultMap="BaseResultMapPojo">
+        SELECT p.*,s.purchase_method
+        FROM product p INNER JOIN stock s ON p.id =s.product_id
+        WHERE p.id =#{id}
 
     </select>
 
@@ -92,7 +109,7 @@
     </select>
 
     <select id="selectSupplierByProductId" resultType="com.caler.zkl.openpsd.bean.Supplier">
-        SELECT s.* FROM  product_supplier p inner join supplier s on p.supplier_id =s.id WHERE p.product_id=#{pid}
+        SELECT distinct s.* FROM  product_supplier p inner join supplier s on p.supplier_id =s.id WHERE p.product_id=#{pid}
 
     </select>
 </mapper>

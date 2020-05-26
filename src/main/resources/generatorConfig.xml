@@ -42,7 +42,7 @@
 <!--            <generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
 <!--        </table>-->
 
-        <table tableName="product_type">
+        <table tableName="product_supplier">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
 

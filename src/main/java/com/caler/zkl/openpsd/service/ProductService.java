@@ -31,6 +31,10 @@ public interface ProductService {
      * 查询单个
      */
     ProductDetail list(Long id);
+    /**
+     * 查询单个
+     */
+    ProductPojo selectOne(Long id);
 
     /**
      * 查询所有
@@ -47,8 +51,9 @@ public interface ProductService {
 
     List<PurchaseMethod> purchaseMethodlist();
 
-    List<ApplicationProduct> applicationProductList(List<Long> ids);
+    List<ProductPojo> applicationProductList(List<Long> ids);
 
     String getProductNo(Long type1,Long type2);
 
+    int  updateStatus(Long id, String status);
 }

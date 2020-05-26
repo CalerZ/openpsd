@@ -17,5 +17,5 @@ public interface ProductDao {
     List< Supplier> selectSupplierByProductId(@Param("pid") Long pid);
 
     List<ProductPojo> selectPojo(@Param("keyword") String keyword, @Param("typeid") Long typeid, @Param("status") Integer status, @Param("createrid") Long createrid);
-
+    ProductPojo selectOneProductPojo(@Param("id") Long id );
 }

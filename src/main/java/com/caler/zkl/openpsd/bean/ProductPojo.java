@@ -1,7 +1,9 @@
 package com.caler.zkl.openpsd.bean;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -10,13 +12,19 @@ import java.util.List;
  * @description :
  */
 @Data
-public class ProductPojo {
-    private Product product;
+public class ProductPojo  extends  Product implements Serializable {
+    @JsonIgnoreProperties(value = { "handler" })
     private ProductType productType1;
+    @JsonIgnoreProperties(value = { "handler" })
     private ProductType productType2;
+    @JsonIgnoreProperties(value = { "handler" })
     private ProductUtil productUtil;
+    @JsonIgnoreProperties(value = { "handler" })
     private Stock stock;
+    @JsonIgnoreProperties(value = { "handler" })
     private Member member;
+    @JsonIgnoreProperties(value = { "handler" })
     private PurchaseMethod purchaseMethod;
+    @JsonIgnoreProperties(value = { "handler" })
     private List<Supplier> supplierList;
 }

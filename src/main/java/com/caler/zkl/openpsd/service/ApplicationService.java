@@ -4,6 +4,7 @@ package com.caler.zkl.openpsd.service;
 import com.caler.zkl.openpsd.bean.Application;
 import com.caler.zkl.openpsd.bean.ApplicationBean;
 import com.caler.zkl.openpsd.bean.ApplicationFormBean;
+import com.caler.zkl.openpsd.bean.ApplicationProductPoJo;
 import com.caler.zkl.openpsd.common.ProductExcelData;
 import com.github.pagehelper.PageInfo;
 
@@ -34,7 +35,7 @@ public interface ApplicationService {
     /**
      * 查询单个
      */
-    ApplicationBean list(Long id);
+    ApplicationProductPoJo list(Long id);
 
     /**
      * 查询所有

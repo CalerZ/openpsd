@@ -1,8 +1,6 @@
 package com.caler.zkl.openpsd.controller;
 
-import com.caler.zkl.openpsd.bean.Application;
-import com.caler.zkl.openpsd.bean.ApplicationBean;
-import com.caler.zkl.openpsd.bean.ApplicationFormBean;
+import com.caler.zkl.openpsd.bean.*;
 import com.caler.zkl.openpsd.common.CommonPage;
 import com.caler.zkl.openpsd.common.CommonResult;
 import com.caler.zkl.openpsd.common.ProductExcelData;
@@ -14,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * @author Caler_赵康乐
@@ -33,7 +33,9 @@ public class ApplicationController {
      */
     @PostMapping("/insert")
     @ApiOperation("保存物品申请单")
-    public CommonResult create(@RequestBody Application application) {
+    public CommonResult create(@RequestBody ApplicationProductPoJo applicationProductPoJo) {
+        Application application = new Application();
+        convertObj(applicationProductPoJo, application);
         return CommonResult.success(applicationService.create(application) > 0 ? true : false);
     }
 
@@ -42,7 +44,9 @@ public class ApplicationController {
      */
     @PostMapping("/submit")
     @ApiOperation("提交物品申请单")
-    public CommonResult submit(@RequestBody Application application) {
+    public CommonResult submit(@RequestBody ApplicationProductPoJo applicationProductPoJo) {
+        Application application = new Application();
+        convertObj(applicationProductPoJo, application);
         return CommonResult.success(applicationService.submit(application) > 0 ? true : false);
     }
 
@@ -51,7 +55,9 @@ public class ApplicationController {
      */
     @PostMapping("/finish")
     @ApiOperation("完成物品申请单")
-    public CommonResult finish(@RequestBody Application application) {
+    public CommonResult finish(@RequestBody ApplicationProductPoJo applicationProductPoJo) {
+        Application application = new Application();
+        convertObj(applicationProductPoJo, application);
         return CommonResult.success(applicationService.finish(application) > 0 ? true : false);
     }
 
@@ -70,7 +76,9 @@ public class ApplicationController {
      */
     @PostMapping("/update")
     @ApiOperation("修改物品申请单")
-    public CommonResult update(@RequestBody Application application) {
+    public CommonResult update(@RequestBody ApplicationProductPoJo applicationProductPoJo) {
+        Application application = new Application();
+        convertObj(applicationProductPoJo, application);
         return CommonResult.success(applicationService.update(application) > 0 ? true : false);
     }
 
@@ -105,7 +113,7 @@ public class ApplicationController {
     @GetMapping("/{id}")
     @ApiOperation("查询单个物品申请单")
     public CommonResult list(@PathVariable("id") Long id) {
-        ApplicationBean applicationBean = applicationService.list(id);
+        ApplicationProductPoJo applicationBean = applicationService.list(id);
         return CommonResult.success(applicationBean);
     }
 
@@ -174,7 +182,6 @@ public class ApplicationController {
     }
 
 
-
     /**
      * 生成申请单单号
      */
@@ -202,6 +209,39 @@ public class ApplicationController {
         return CommonResult.success(CommonPage.restPage(productExcelDatas));
 
 
+    }
+
+
+    public void convertObj(ApplicationProductPoJo applicationProductPoJo, Application application) {
+        application.setApplicationForm(applicationProductPoJo.getApplicationForm());
+        AtomicInteger count = new AtomicInteger();
+        List<ApplicationProduct> applicationProducts = applicationProductPoJo.getApplicationProducts().stream().map(item -> {
+            ApplicationProduct applicationProduct = new ApplicationProduct();
+            applicationProduct.setId(item.getId());
+            applicationProduct.setProductName(item.getName());
+            applicationProduct.setProductCode(item.getCode());
+            applicationProduct.setProductId(item.getId());
+            applicationProduct.setType1(item.getProductType1().getId());
+            applicationProduct.setType2(item.getProductType2().getpId());
+            applicationProduct.setDescription(item.getDescription());
+            applicationProduct.setSpecifications(item.getSpecifications());
+            applicationProduct.setUnit(item.getProductUtil().getId());
+            applicationProduct.setPrice(item.getPrice());
+            applicationProduct.setStandard(item.getStandard());
+            applicationProduct.setSafetyStock(item.getStock().getSafetyStock());
+            applicationProduct.setLastMonthQuantity(item.getStock().getLastMonthQuantity());
+            applicationProduct.setOnHandInventory(item.getStock().getOnHandInventory());
+            applicationProduct.setReportedQuantity(item.getStock().getReportedQuantity());
+            applicationProduct.setSort(count.getAndIncrement());
+            applicationProduct.setNote(null);
+            applicationProduct.setStatus(item.getStatus());
+            applicationProduct.setIsDelete(item.getIsDelete());
+            applicationProduct.setProdLineMembers(item.getStock().getProdLineMembers());
+            applicationProduct.setPurchaseMethod(item.getPurchaseMethod().getId());
+            applicationProduct.setSupplierId( Long.valueOf(item.getSupplierId()) );
+            return applicationProduct;
+        }).collect(Collectors.toList());
+        application.setApplicationProducts(applicationProducts);
     }
 
 }

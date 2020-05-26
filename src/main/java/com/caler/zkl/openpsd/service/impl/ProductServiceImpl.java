@@ -13,18 +13,25 @@ import com.caler.zkl.openpsd.service.StockService;
 import com.caler.zkl.openpsd.service.UserService;
 import com.caler.zkl.openpsd.util.UserServiceUtil;
 import com.github.pagehelper.PageHelper;
+import lombok.var;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.rmi.CORBA.Util;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static sun.plugin2.os.windows.FLASHWINFO.size;
 
 /**
  * @author Caler_赵康乐
@@ -34,20 +41,31 @@ import java.util.stream.Collectors;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    @Autowired
+    //    @Autowired
+    @Resource
     private ProductMapper productMapper;
     @Autowired
     private ProductDao productDao;
-    @Autowired
-    private StockMapper stockMapper;
+
     @Autowired
     private PurchaseMethodMapper purchaseMethodMapper;
     @Autowired
     private UserServiceUtil userServiceUtil;
     @Autowired
     private SysDictMapper sysDictMapper;
-    @Autowired
+
+    @Resource
     private ProductTypeMapper productTypeMapper;
+    @Resource
+    private ProductUtilMapper productUtilMapper;
+    @Resource
+    private StockMapper stockMapper;
+    @Resource
+    private MemberMapper memberMapper;
+    @Resource
+    private SupplierMapper supplierMapper;
+    @Resource
+    private ProductSupplierMapper productSupplierMapper;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -62,6 +80,14 @@ public class ProductServiceImpl implements ProductService {
         stock.setProductId(product.getId());
         stock.setProductCode(product.getCode());
         stockMapper.insertSelective(stock);
+        String supplierIds = product.getSupplierId();
+        String[] sidArr = supplierIds.split(",");
+        for (String sid : sidArr) {
+            ProductSupplier productSupplier = new ProductSupplier();
+            productSupplier.setProductId(product.getId());
+            productSupplier.setSupplierId(Long.valueOf(sid));
+            productSupplierMapper.insertSelective(productSupplier);
+        }
         return count;
     }
 
@@ -75,6 +101,18 @@ public class ProductServiceImpl implements ProductService {
         count += productMapper.updateByPrimaryKeySelective(product);
         Stock stock = productDetail.getStock();
         count += stockMapper.updateByPrimaryKeySelective(stock);
+        //删除供应商后重新添加
+        ProductSupplierExample example = new ProductSupplierExample();
+        example.createCriteria().andProductIdEqualTo(product.getId());
+        productSupplierMapper.deleteByExample(example);
+        String supplierIds = product.getSupplierId();
+        String[] sidArr = supplierIds.split(",");
+        for (String sid : sidArr) {
+            ProductSupplier productSupplier = new ProductSupplier();
+            productSupplier.setProductId(product.getId());
+            productSupplier.setSupplierId(Long.valueOf(sid));
+            productSupplierMapper.insertSelective(productSupplier);
+        }
         return count;
     }
 
@@ -101,44 +139,20 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<PurchaseMethod> purchaseMethodlist() {
         PurchaseMethodExample example = new PurchaseMethodExample();
+        example.setOrderByClause(" id desc");
         List<PurchaseMethod> purchaseMethods = purchaseMethodMapper.selectByExample(example);
         return purchaseMethods;
     }
 
     @Override
-    public List<ApplicationProduct> applicationProductList(List<Long> ids) {
-        ProductExample example = new ProductExample();
-        example.createCriteria().andIdIn(ids);
-        List<Product> products = productMapper.selectByExample(example);
-        List<ApplicationProduct> applicationProducts = products.stream().map(product -> {
-            ApplicationProduct applicationProduct = new ApplicationProduct();
-            applicationProduct.setProductName(product.getName());
-            applicationProduct.setProductCode(product.getCode());
-            applicationProduct.setProductId(product.getId());
-
-            applicationProduct.setType1(product.getType1());
-            applicationProduct.setType2(product.getType2());
-            applicationProduct.setDescription(product.getDescription());
-            applicationProduct.setSpecifications(product.getSpecifications());
-            applicationProduct.setUnit(product.getUnit());
-            applicationProduct.setPrice(product.getPrice());
-            applicationProduct.setStandard(product.getStandard());
-
-            //库存
-            StockExample stockExample = new StockExample();
-            stockExample.createCriteria().andProductIdEqualTo(product.getId());
-            List<Stock> stocks = stockMapper.selectByExample(stockExample);
-            Stock stock = stocks.get(0);
-            applicationProduct.setSafetyStock(stock.getSafetyStock());
-            applicationProduct.setOnHandInventory(stock.getOnHandInventory());
-            applicationProduct.setReportedQuantity(stock.getReportedQuantity());
-            applicationProduct.setPurchaseMethod(stock.getPurchaseMethod());
-            applicationProduct.setProdLineMembers(stock.getProdLineMembers());
-            applicationProduct.setLastMonthQuantity(stock.getLastMonthQuantity());
-
-            return applicationProduct;
+    public List<ProductPojo> applicationProductList(List<Long> ids) {
+        List<ProductPojo> pojos = ids.stream().map(item -> {
+            if (item != null) {
+                return selectOne(item);
+            }
+            return null;
         }).collect(Collectors.toList());
-        return applicationProducts;
+        return pojos;
     }
 
     @Override
@@ -183,6 +197,13 @@ public class ProductServiceImpl implements ProductService {
         return partNo.toString();
     }
 
+    @Override
+    public int updateStatus(Long id, String status) {
+        Product product = new Product();
+        product.setId(id);
+        product.setStatus(Integer.valueOf(status));
+        return productMapper.updateByPrimaryKeySelective(product);
+    }
 
 
     @Override
@@ -197,17 +218,50 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ProductPojo selectOne(Long id) {
+        ProductPojo productPojo = new ProductPojo();
+        Product product = productMapper.selectByPrimaryKey(id);
+        BeanUtils.copyProperties(product, productPojo);
+        productPojo.setProductType1(productTypeMapper.selectByPrimaryKey(product.getType1()));
+        if (product.getType2() != null) {
+            productPojo.setProductType2(productTypeMapper.selectByPrimaryKey(product.getType2()));
+        }
+        if (product.getUnit() != null) {
+            productPojo.setProductUtil(productUtilMapper.selectByPrimaryKey(product.getUnit()));
+        }
+        StockExample example = new StockExample();
+        example.createCriteria().andProductIdEqualTo(product.getId());
+        List<Stock> stocks = stockMapper.selectByExample(example);
+        if (stocks.size() > 0) {
+            productPojo.setStock(stocks.get(0));
+            productPojo.setPurchaseMethod(purchaseMethodMapper.selectByPrimaryKey(stocks.get(0).getPurchaseMethod()));
+        }
+        productPojo.setMember(memberMapper.selectByPrimaryKey(product.getCreateOn()));
+        String supplierId = product.getSupplierId();
+        String[] sids = supplierId.split(",");
+
+        List<Supplier> supplierList = Arrays.stream(sids).map(sid -> {
+            if (sid != null) {
+                Supplier supplier = supplierMapper.selectByPrimaryKey(Long.valueOf(sid));
+                return supplier;
+            }
+            return null;
+        }).collect(Collectors.toList());
+        productPojo.setSupplierList(supplierList);
+        return productPojo;
+    }
+
+    @Override
     public List<Product> list() {
         ProductExample example = new ProductExample();
         example.createCriteria().andIsDeleteEqualTo(0);
+        example.setOrderByClause(" id desc");
         return productMapper.selectByExample(null);
     }
 
 
     public List<Product> list1(String keyword, Long typeid, Integer status, Long createrid, Integer pageSize, Integer pageNum) {
         PageHelper.startPage(pageNum, pageSize);
-
-
         ProductExample example = new ProductExample();
         ProductExample.Criteria criteria = example.createCriteria();
         criteria.andIsDeleteEqualTo(0);
@@ -225,7 +279,7 @@ public class ProductServiceImpl implements ProductService {
         if (createrid != null) {
             criteria.andCreateOnEqualTo(createrid);
         }
-        example.setOrderByClause("modify_time desc,create_time desc");
+        example.setOrderByClause(" id desc");
         return productMapper.selectByExample(example);
     }
 
@@ -234,4 +288,7 @@ public class ProductServiceImpl implements ProductService {
         PageHelper.startPage(pageNum, pageSize);
         return productDao.select(keyword, typeid, status, createrid);
     }
+
+
+
 }

@@ -43,6 +43,16 @@ public class ProductController {
     }
 
     /**
+     * 修改状态
+     */
+    @PostMapping("/updateStatus")
+    @ApiOperation("修改物品状态")
+    public CommonResult updateStatus(@RequestParam(value = "id",required = true) Long id,
+                                     @RequestParam(value = "status",required = true) String status){
+        return CommonResult.success(productService.updateStatus(id,status)>0?true:false);
+    }
+
+    /**
      * 批量删除
      */
     @DeleteMapping("/delete")
@@ -62,13 +72,23 @@ public class ProductController {
 
 
     /**
-     * 查询所有
+     * 查询单个ProductDetail
      */
     @GetMapping("/{id}")
-    @ApiOperation("查询单个物品")
+    @ApiOperation("查询单个物品ProductDetail")
     public CommonResult list(@PathVariable("id") Long id){
         ProductDetail productDetail = productService.list(id);
         return CommonResult.success(productDetail);
+    }
+
+    /**
+     * 查询单个ProductPojo
+     */
+    @PostMapping("/{id}")
+    @ApiOperation("查询单个物品ProductPojo")
+    public CommonResult selectOne(@PathVariable("id") Long id){
+        ProductPojo productPojo = productService.selectOne(id);
+        return CommonResult.success(productPojo);
     }
 
 
@@ -87,7 +107,7 @@ public class ProductController {
      * 条件分页查询
      */
     @PostMapping("/list")
-    @ApiOperation("查询条件查询物品")
+    @ApiOperation("查询条件查询未删除物品")
     public CommonResult list(@RequestParam(value = "keyword",required = false) String keyword,
                              @RequestParam(value = "typeid",required = false) Long typeid,
                              @RequestParam(value = "status",required = false) Integer status,
@@ -117,7 +137,7 @@ public class ProductController {
 
 
     /**
-     * 查询所有
+     * 查询所有采购方式
      */
     @GetMapping("/purchaseMethod")
     @ApiOperation("查询所有采购方式")
@@ -132,7 +152,7 @@ public class ProductController {
     @PostMapping("/applicationProductList")
     @ApiOperation("查询所有物品封装为applicationProduct")
     public CommonResult applicationProductList(@RequestBody  List<Long> ids){
-        List<ApplicationProduct> list = productService.applicationProductList(ids);
+        List<ProductPojo> list = productService.applicationProductList(ids);
         return CommonResult.success(list);
     }
 

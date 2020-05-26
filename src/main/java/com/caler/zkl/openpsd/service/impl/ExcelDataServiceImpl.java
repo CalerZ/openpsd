@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.caler.zkl.openpsd.bean.*;
 import com.caler.zkl.openpsd.common.ProductExcelData;
 import com.caler.zkl.openpsd.mapper.ProductDao;
+import com.caler.zkl.openpsd.mapper.ProductSupplierMapper;
 import com.caler.zkl.openpsd.service.*;
 import com.caler.zkl.openpsd.util.ExcelUtil;
 import com.caler.zkl.openpsd.util.SpringUtil;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -40,6 +42,8 @@ public class ExcelDataServiceImpl implements ExcelDataService {
     private ProductService productService;
     @Autowired
     private UserServiceUtil userServiceUtil;
+    @Resource
+    private ProductSupplierMapper productSupplierMapper;
 
     List<ProductType> productTypeList = new ArrayList<>();
     List<ProductUtil> productUtilList = new ArrayList<>();
@@ -129,17 +133,17 @@ public class ExcelDataServiceImpl implements ExcelDataService {
             }
             //4.供应商
             String sus = item.getSuppliers().trim();
-            String[] arr = null;
+            String[] arr = sus.split(",");
             List<String> slist = new ArrayList<>();
-            if ((arr = sus.split(",")) != null || (arr = sus.split("，")) != null) {
-                Arrays.stream(arr).forEach(t -> {
-                    supplierList.stream().forEach(su -> {
+            if (arr != null && arr.length>0) {
+                for (String t : arr) {
+                    for (Supplier su : supplierList) {
                         if (su.getName().equals(t)) {
                             slist.add(su.getId() + "");
                         }
+                    }
+                }
 
-                    });
-                });
             }
             if (slist.size() != 0) {
                 p.setSupplierId(String.join(",", slist));
@@ -182,12 +186,22 @@ public class ExcelDataServiceImpl implements ExcelDataService {
             p.setCreateOn(userServiceUtil.getUser().getId());
             detail.setProduct(p);
             productService.create(detail);
+            //物料与供应商关联
+            String supplierIds = p.getSupplierId();
+            String[] sidArr = supplierIds.split(",");
+            for (String sid : sidArr) {
+                ProductSupplier productSupplier = new ProductSupplier();
+                productSupplier.setProductId(p.getId());
+                productSupplier.setSupplierId(Long.valueOf(sid));
+                productSupplierMapper.insertSelective(productSupplier);
+            }
             if (!"".equals(msg.toString())) {
                 result.add(new ExcelImportResult(item.getProductName(), item.getType1() + (StrUtil.isEmpty(item.getType2()) ? "" : "_" + item.getType2()), "导入失败", msg.toString()));
             } else {
                 result.add(new ExcelImportResult(item.getProductName(), item.getType1() + (StrUtil.isEmpty(item.getType2()) ? "" : "_" + item.getType2()), "导入成功", msg.toString()));
 
             }
+
 
         });
         return result;
