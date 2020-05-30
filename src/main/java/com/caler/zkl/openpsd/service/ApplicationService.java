@@ -2,11 +2,9 @@ package com.caler.zkl.openpsd.service;
 
 
 import com.caler.zkl.openpsd.bean.Application;
-import com.caler.zkl.openpsd.bean.ApplicationBean;
 import com.caler.zkl.openpsd.bean.ApplicationFormBean;
 import com.caler.zkl.openpsd.bean.ApplicationProductPoJo;
-import com.caler.zkl.openpsd.common.ProductExcelData;
-import com.github.pagehelper.PageInfo;
+import com.caler.zkl.openpsd.bean.ExportProductData;
 
 import java.util.List;
 
@@ -48,11 +46,11 @@ public interface ApplicationService {
     List<ApplicationFormBean> list(String keyword, Integer pageSize, Integer pageNum);
 
 
-    List<ApplicationFormBean> myApplicationList(String keyword, Integer pageSize, Integer pageNum);
+    List<ApplicationFormBean> myApplicationList(String keyword,Integer status,String date1,String date2, Integer pageSize, Integer pageNum);
 
-    List<ApplicationFormBean> reviewedApplicationList(String keyword, Integer pageSize, Integer pageNum);
+    List<ApplicationFormBean> reviewedApplicationList(String keyword,String  applyUser,String  date1,String  date2, Integer pageSize, Integer pageNum);
 
-    List<ApplicationFormBean> finishApplicationList(String keyword, Integer pageSize, Integer pageNum);
+    List<ApplicationFormBean> finishApplicationList(String keyword,String  applyUser,String  date1,String  date2, Integer pageSize, Integer pageNum);
 
     int submit(Application application);
 
@@ -60,9 +58,9 @@ public interface ApplicationService {
 
     int updateStatus(List<Long> ids);
 
-    List<ProductExcelData> getExcelData(String[] date, String quarter, String year);
+    List<ExportProductData> getExcelData(String date1, String date2, String quarter, String year);
 
-    List<ProductExcelData> getExcelDataList(String[] date, String quarter, String year, Integer pageSize, Integer pageNum);
+    List<ExportProductData> getExcelDataList(String date1, String date2, String quarter, String year, Integer pageSize, Integer pageNum);
 
     int finish(Application applicationBean);
 

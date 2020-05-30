@@ -1,7 +1,6 @@
 package com.caler.zkl.openpsd.service;
 
 import com.caler.zkl.openpsd.bean.ExcelImportResult;
-import com.caler.zkl.openpsd.common.ProductExcelData;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

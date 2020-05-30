@@ -4,18 +4,10 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.util.*;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.io.FileUtil;
-import com.caler.zkl.openpsd.bean.ExcelData;
 import com.caler.zkl.openpsd.bean.ExcelImportResult;
-import com.caler.zkl.openpsd.bean.Product;
 import com.caler.zkl.openpsd.common.CommonPage;
 import com.caler.zkl.openpsd.common.CommonResult;
-import com.caler.zkl.openpsd.common.ProductExcelData;
-import com.caler.zkl.openpsd.mapper.ApplicationFormDao;
-import com.caler.zkl.openpsd.mapper.ProductDao;
-import com.caler.zkl.openpsd.mapper.ProductMapper;
-import com.caler.zkl.openpsd.service.ApplicationService;
+import com.caler.zkl.openpsd.bean.ExportProductData;
 import com.caler.zkl.openpsd.service.ExcelDataService;
 import com.caler.zkl.openpsd.util.ExcelUtil;
 import io.swagger.annotations.Api;
@@ -55,34 +47,28 @@ public class ExcelOperationController {
     @ApiOperation("导出物料信息")
     public CommonResult exportExcel(
             @RequestParam(value = "quarter", required = false) String quarter,
-            @RequestParam(value = "date[]", required = false) String[] date,
+            @RequestParam(value = "date1", required = false) String date1,
+            @RequestParam(value = "date2", required = false) String date2,
             @RequestParam(value = "year", required = false) String year,
-            @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
-            @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
             HttpServletResponse response) throws IOException {
-
         //根据id去查询分类
-        Map<String, List<ProductExcelData>> map = new HashMap<>();
-        List<ProductExcelData> productExcelDatas = applicationService.getExcelData(date, quarter, year);
-        productExcelDatas.forEach(item -> {
+        Map<String, List<ExportProductData>> map = new HashMap<>();
+        List<ExportProductData> exportProductDatas = applicationService.getExcelData(date1,date2, quarter, year);
+        exportProductDatas.forEach(item -> {
             if (!map.containsKey(item.getType())) {
-                List<ProductExcelData> list = new ArrayList<>();
+                List<ExportProductData> list = new ArrayList<>();
                 item.setNoid(1 + "");
                 list.add(item);
                 map.put(item.getType(), list);
             } else {
-                List<ProductExcelData> list = map.get(item.getType());
+                List<ExportProductData> list = map.get(item.getType());
                 item.setNoid(list.size() + 1 + "");
                 list.add(item);
                 map.put(item.getType(), list);
             }
         });
-
-        long t1 = System.currentTimeMillis();
-        ExcelUtil.writeExcel(response, map, ProductExcelData.class);
-        long t2 = System.currentTimeMillis();
-        log.info(String.format("write over! cost:%sms", (t2 - t1)));
-        return CommonResult.success("物料信息导出.xlsx");
+        ExcelUtil.writeExcel(response, map, ExportProductData.class);
+        return CommonResult.success("");
     }
 
     /**

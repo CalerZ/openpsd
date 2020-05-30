@@ -13,6 +13,7 @@ import java.util.List;
  */
 @Data
 public class ProductPojo  extends  Product implements Serializable {
+    private Long productId;
     @JsonIgnoreProperties(value = { "handler" })
     private ProductType productType1;
     @JsonIgnoreProperties(value = { "handler" })

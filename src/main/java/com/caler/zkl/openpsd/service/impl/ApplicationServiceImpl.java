@@ -2,19 +2,17 @@ package com.caler.zkl.openpsd.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.caler.zkl.openpsd.bean.*;
-import com.caler.zkl.openpsd.common.CommonPage;
-import com.caler.zkl.openpsd.common.ProductExcelData;
+import com.caler.zkl.openpsd.bean.ExportProductData;
+import com.caler.zkl.openpsd.bean.ImportProductData;
 import com.caler.zkl.openpsd.mapper.*;
 import com.caler.zkl.openpsd.service.ApplicationService;
 import com.caler.zkl.openpsd.util.UserServiceUtil;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,7 +50,6 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Transactional
     public int create(Application application) {
 
-
         ReentrantLock lock = new ReentrantLock();
         try {
             lock.lock();
@@ -83,12 +80,6 @@ public class ApplicationServiceImpl implements ApplicationService {
         } finally {
             lock.unlock();
         }
-    }
-
-    private void copyProperties(ApplicationBean applicationBean, Application application) {
-
-        BeanUtil.copyProperties(applicationBean.getApplicationForm(), application.getApplicationForm());
-        BeanUtil.copyProperties(applicationBean.getApplicationProducts(), application.getApplicationProducts());
     }
 
     @Override
@@ -183,10 +174,11 @@ public class ApplicationServiceImpl implements ApplicationService {
         List<ApplicationProductBean> applicationProductBeans = applicationFormDao.selectFormProduct(id);
         List<ProductPojo> productPojos = applicationProductBeans.stream().map(item -> {
             ProductPojo productPojo = new ProductPojo();
-            BeanUtil.copyProperties(item,productPojo);
+            BeanUtil.copyProperties(item, productPojo);
 
             productPojo.setName(item.getProductName());
-            productPojo.setId(item.getId());
+            productPojo.setId(item.getId());//applicationproductid
+            productPojo.setProductId(item.getProductId());//物料id
             productPojo.setStatus(item.getStatus());
             productPojo.setCode(item.getProductCode());
             productPojo.setIsDelete(item.getIsDelete());
@@ -249,31 +241,31 @@ public class ApplicationServiceImpl implements ApplicationService {
     public List<ApplicationFormBean> list(String keyword, Integer pageSize, Integer pageNum) {
         Long userid = userServiceUtil.getUser().getId();
         PageHelper.startPage(pageNum, pageSize);
-        List<ApplicationFormBean> list = applicationFormDao.myApplicationList(keyword, null, userid);
+        List<ApplicationFormBean> list = applicationFormDao.myApplicationList(keyword, null, null, null, userid);
         return list;
     }
 
     @Override
-    public List<ApplicationFormBean> myApplicationList(String keyword, Integer pageSize, Integer pageNum) {
+    public List<ApplicationFormBean> myApplicationList(String keyword, Integer status, String date1, String date2, Integer pageSize, Integer pageNum) {
 
         Long userid = userServiceUtil.getUser().getId();
         PageHelper.startPage(pageNum, pageSize);
-        List<ApplicationFormBean> list = applicationFormDao.myApplicationList(keyword, null, userid);
+        List<ApplicationFormBean> list = applicationFormDao.myApplicationList(keyword, status, date1, date2, userid);
         return list;
     }
 
-    public List<ApplicationFormBean> reviewedApplicationList(String keyword, Integer pageSize, Integer pageNum) {
+    public List<ApplicationFormBean> reviewedApplicationList(String keyword, String applyUser, String date1, String date2, Integer pageSize, Integer pageNum) {
         Long userid = userServiceUtil.getUser().getId();
         PageHelper.startPage(pageNum, pageSize);
-        List<ApplicationFormBean> list = applicationFormDao.reviewedApplicationList(keyword, userid);
+        List<ApplicationFormBean> list = applicationFormDao.reviewedApplicationList(keyword, applyUser, date1, date2, userid);
         return list;
     }
 
     @Override
-    public List<ApplicationFormBean> finishApplicationList(String keyword, Integer pageSize, Integer pageNum) {
+    public List<ApplicationFormBean> finishApplicationList(String keyword, String applyUser, String date1, String date2, Integer pageSize, Integer pageNum) {
         Long userid = userServiceUtil.getUser().getId();
         PageHelper.startPage(pageNum, pageSize);
-        List<ApplicationFormBean> list = applicationFormDao.finishApplicationList(keyword, userid);
+        List<ApplicationFormBean> list = applicationFormDao.finishApplicationList(keyword, applyUser, date1, date2, userid);
         return list;
     }
 
@@ -345,11 +337,9 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<ProductExcelData> getExcelData(String[] dates, String quarter, String year) {
+    public List<ExportProductData> getExcelData(String date1, String date2, String quarter, String year) {
         SimpleDateFormat sdfa = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         String format = sdfa.format(new Date());
-        String[] years = new String[2];
-        String[] quarters = new String[2];
         String dateStart = null;
         String dateEnd = null;
         String quarterStart = null;
@@ -357,12 +347,9 @@ public class ApplicationServiceImpl implements ApplicationService {
         String yearStart = null;
         String yearEnd = null;
         String yearStr = format.substring(0, format.indexOf("-"));
-        if (dates != null && dates.length >= 2) {//选定日期
-            Date date1 = new Date(dates[0]);
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            dateStart = sdf.format(date1) + " 00:00:00";
-            Date date2 = new Date(dates[1]);
-            dateEnd = sdf.format(date2) + " 00:00:00";
+        if (date1 != null && !"".equals(date1)) {//选定日期
+            dateStart = date1 + " 00:00:00";
+            dateEnd = date2 + " 00:00:00";
         } else if (quarter != null && !"".equals(quarter)) {//季度
             if ("1".equals(quarter)) {
                 quarterStart = yearStr + "-01-01 00:00:00";
@@ -392,9 +379,9 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<ProductExcelData> getExcelDataList(String[] date, String quarter, String year, Integer pageSize, Integer pageNum) {
+    public List<ExportProductData> getExcelDataList(String date1, String date2, String quarter, String year, Integer pageSize, Integer pageNum) {
         PageHelper.startPage(pageNum, pageSize);
-        List<ProductExcelData> excelData = getExcelData(date, quarter, year);
+        List<ExportProductData> excelData = getExcelData(date1,date2, quarter, year);
         return excelData;
     }
 

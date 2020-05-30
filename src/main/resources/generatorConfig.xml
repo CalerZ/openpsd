@@ -15,7 +15,7 @@
         <plugin type="org.mybatis.generator.plugins.ToStringPlugin"/>
         <!--生成mapper.xml时覆盖原文件-->
         <plugin type="org.mybatis.generator.plugins.UnmergeableXmlMappersPlugin" />
-        <commentGenerator type="com.caler.zkl.openpsd.common.CommentGenerator">
+        <commentGenerator type="com.caler.zkl.openpsd.bmg.CommentGenerator">
             <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
             <property name="suppressAllComments" value="true"/>
             <property name="suppressDate" value="true"/>
@@ -24,7 +24,7 @@
 
 
         <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
-                        connectionURL="jdbc:mysql://127.0.0.1:3306/psd?serverTimezone=UTC"
+                        connectionURL="jdbc:mysql://127.0.0.1:3306/psd?serverTimezone=Asia/Shanghai"
                         userId="root"
                         password="root">
             <!--解决mysql驱动升级到8.0后不生成指定数据库代码的问题-->
@@ -42,7 +42,10 @@
 <!--            <generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
 <!--        </table>-->
 
-        <table tableName="product_supplier">
+        <table tableName="application_form">
+            <generatedKey column="id" sqlStatement="MySql" identity="true"/>
+        </table>
+        <table tableName="application_product">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
 

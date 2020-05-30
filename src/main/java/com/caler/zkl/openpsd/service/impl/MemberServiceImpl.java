@@ -92,7 +92,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public List<Member> list() {
-        return memberMapper.selectByExample(null);
+        MemberExample example = new MemberExample();
+        example.createCriteria().andStatusEqualTo(1);
+        return memberMapper.selectByExample(example);
     }
 
     @Override

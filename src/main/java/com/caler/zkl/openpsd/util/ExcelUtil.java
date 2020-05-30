@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletResponse;
 
 import com.caler.zkl.openpsd.anno.ExcelColumn;
-import com.caler.zkl.openpsd.common.ProductExcelData;
+import com.caler.zkl.openpsd.bean.ExportProductData;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -236,11 +236,10 @@ public class ExcelUtil {
      * 写入到excel      需求  创建sheet页 放入数据，一个excel有多个sheet页然后放入不同类型的数据，导出
      *
      * @param response
-     * @param dataList
      * @param cls
      * @param <T>
      */
-    public static <T> void writeExcel(HttpServletResponse response, Map<String, List<ProductExcelData>> map, Class<T> cls) {
+    public static <T> void writeExcel(HttpServletResponse response, Map<String, List<ExportProductData>> map, Class<T> cls) {
         Field[] fields = cls.getDeclaredFields();
         List<Field> fieldList = Arrays.stream(fields)
                 .filter(field -> {
@@ -260,7 +259,15 @@ public class ExcelUtil {
                 })).collect(Collectors.toList());
 
         Workbook wb = new XSSFWorkbook();
+        if(map.size()==0){
+            wb.createSheet("物资申请汇总表");
+            buildExcelDocument("abbot.xlsx", wb, response);
+            return;
+        }
         for (String key:map.keySet()) {
+            if(key==null||"".equals(key)){
+                key="物资申请汇总表";
+            }
             Sheet sheet = wb.createSheet(key);
             AtomicInteger ai = new AtomicInteger();
             {
@@ -309,6 +316,7 @@ public class ExcelUtil {
             //冻结窗格
             wb.getSheet(key).createFreezePane(0, 1, 0, 1);
         }
+
         //浏览器下载excel
         buildExcelDocument("abbot.xlsx", wb, response);
         //生成excel文件

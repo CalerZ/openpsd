@@ -42,5 +42,9 @@ public interface ProductUtilService {
     List<ProductUtil> list(String keyword, Integer pageSize, Integer pageNum);
 
 
+    int updateStatus(Long id, Integer status);
 
+    int sealed(List<Long> ids);
+
+    int updateStatus(List<Long> ids,Integer status);
 }

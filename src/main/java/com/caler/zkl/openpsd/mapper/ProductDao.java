@@ -1,7 +1,7 @@
 package com.caler.zkl.openpsd.mapper;
 
 import com.caler.zkl.openpsd.bean.*;
-import com.caler.zkl.openpsd.common.ProductExcelData;
+import com.caler.zkl.openpsd.bean.ImportProductData;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -11,7 +11,7 @@ public interface ProductDao {
 
     String selectMaxPartNo(@Param("tag") String tag);
 
-    List<ProductExcelData> getExcelData(List<Long> ids);
+    List<ImportProductData> getExcelData(List<Long> ids);
 
     Stock selectStockByProductId(@Param("pid") Long pid);
     List< Supplier> selectSupplierByProductId(@Param("pid") Long pid);

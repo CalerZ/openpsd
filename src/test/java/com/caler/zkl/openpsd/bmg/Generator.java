@@ -1,4 +1,4 @@
-package com.caler.zkl.openpsd.common;
+package com.caler.zkl.openpsd.bmg;
 
 import org.mybatis.generator.api.MyBatisGenerator;
 import org.mybatis.generator.config.Configuration;

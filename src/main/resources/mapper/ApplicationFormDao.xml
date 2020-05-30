@@ -31,7 +31,7 @@
         <if test="status!=null and status!=''">
             and a.apply_status = #{status}
         </if>
-        order by a.apply_time desc,a.modify_time desc
+        order by id desc
     </select>
 
     <select id="myApplicationList" resultMap="BaseResultMap">
@@ -39,12 +39,25 @@
         FROM application_form a,company b,member c
         WHERE a.apply_company=b.id AND a.apply_on=c.id and a.is_delete=0 and apply_on=#{userid}
         <if test="keyword!=null and keyword!=''">
-            and a.code like #{keyword}
+            and a.form_code like  concat('%','${keyword}','%')
         </if>
         <if test="status!=null and status!=''">
-            and a.apply_status = #{status}
+            <choose>
+                <when test="status==0">
+                    and  (a.apply_status = #{status} or a.apply_status = 3  )
+                </when>
+                <when test="status==3">
+                    and  (a.apply_status = #{status} or a.apply_status = 0  )
+                </when>
+                <otherwise>
+                    and  a.apply_status = #{status}
+                </otherwise>
+            </choose>
         </if>
-        order by a.apply_time desc,a.modify_time desc
+        <if test="date1!=null and date1!=''">
+            and a.apply_time &gt;=  #{date1} and a.apply_time &lt;=   #{date2}
+        </if>
+        order by id desc
     </select>
 
     <select id="reviewedApplicationList" resultMap="BaseResultMap">
@@ -54,9 +67,15 @@
         and a.is_delete=0 and a.approver = #{userid}
         and a.apply_status=1
         <if test="keyword!=null and keyword!=''">
-            and a.code like #{keyword}
+            and a.form_code like #{keyword}
         </if>
-        order by a.apply_time desc,a.modify_time desc
+        <if test="applyUser!=null and applyUser!=''">
+           and apply_on = #{applyUser}
+        </if>
+        <if test="date1!=null and date1!=''">
+            and a.apply_time &gt;=  #{date1} and a.apply_time &lt;=   #{date2}
+        </if>
+        order by id desc
     </select>
 
     <select id="finishApplicationList" resultMap="BaseResultMap">
@@ -66,13 +85,19 @@
         and a.is_delete=0 and a.approver = #{userid}
         and a.apply_status=2
         <if test="keyword!=null and keyword!=''">
-            and a.code like #{keyword}
+            and a.form_code like #{keyword}
         </if>
-        order by a.apply_time desc,a.modify_time desc
+        <if test="applyUser!=null and applyUser!=''">
+            and apply_on = #{applyUser}
+        </if>
+        <if test="date1!=null and date1!=''">
+            and a.apply_time &gt;=  #{date1} and a.apply_time &lt;=   #{date2}
+        </if>
+        order by  id desc
     </select>
 
 
-    <resultMap id="excelDataMap" type="com.caler.zkl.openpsd.common.ProductExcelData">
+    <resultMap id="excelDataMap" type="com.caler.zkl.openpsd.bean.ImportProductData">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="type" property="type"/>
         <result column="product_name" property="productName"/>
@@ -90,26 +115,26 @@
     </resultMap>
 
     <select id="getExcelData" resultMap="excelDataMap">
-        SELECT CONCAT(b.type_name,'(',b1.type_name,')') TYPE, a.product_name,a.specifications,c.util_name,a.price,
-        a.standard,d.safety_stock,d.last_month_quantity ,d.on_hand_inventory,d.reported_quantity,f.name purchase_method,
-        d.prod_line_members
+        SELECT CONCAT(b.type_name,IF(b1.type_name IS NULL,"",CONCAT('(',b1.type_name,')')) ) TYPE, a.product_name,a.specifications,c.util_name,a.price,
+        a.standard,safety_stock,last_month_quantity ,on_hand_inventory,reported_quantity,f.name purchase_method,
+        prod_line_members
         FROM application_form t
         RIGHT JOIN application_product a ON t.id=a.mainid
         LEFT JOIN product_type b ON a.type_1 = b.id
         LEFT JOIN product_type b1 ON a.type_2 = b1.id
         LEFT JOIN product_util c ON a.unit=c.id
-        INNER JOIN stock d ON a.id=d.product_id
-        LEFT JOIN purchase_method f ON d.purchase_method=f.id
-        WHERE a.is_delete=0 AND a.status=1
+        LEFT JOIN purchase_method f ON a.purchase_method=f.id
+        WHERE a.is_delete=0 AND a.status=2
         <if test="dateS!=null and dateE!=null">
-            AND t.apply_time &gt;= #{dateS} and t.apply_time &lt;= #{dateE}
+            AND t.modify_time &gt;= #{dateS} and t.modify_time &lt;= #{dateE}
         </if>
         <if test="quarterS!=null and quarterE!=null">
-            AND t.apply_time &gt;= #{quarterS} and t.apply_time &lt;= #{quarterE}
+            AND t.modify_time &gt;= #{quarterS} and t.modify_time &lt;= #{quarterE}
         </if>
         <if test="yearS!=null and yearE!=null ">
-            AND t.apply_time &gt;= #{yearS} and t.apply_time &lt;= #{yearE}
+            AND t.modify_time &gt;= #{yearS} and t.modify_time &lt;= #{yearE}
         </if>
+        order by t.modify_time ,t.id desc
 
     </select>
 

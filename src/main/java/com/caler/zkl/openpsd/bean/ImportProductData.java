@@ -1,4 +1,4 @@
-package com.caler.zkl.openpsd.common;
+package com.caler.zkl.openpsd.bean;
 
 import com.caler.zkl.openpsd.anno.ExcelColumn;
 import lombok.Data;
@@ -9,7 +9,7 @@ import lombok.Data;
  * @description :
  */
 @Data
-public class ProductExcelData {
+public class ImportProductData {
     @ExcelColumn(value = "序号", col = 1)
     private String noid;
 

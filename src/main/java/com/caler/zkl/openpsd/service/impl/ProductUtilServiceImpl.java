@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Caler_赵康乐
@@ -19,42 +20,42 @@ import java.util.List;
 public class ProductUtilServiceImpl implements ProductUtilService {
 
     @Autowired
-    private ProductUtilMapper memberMapper;
+    private ProductUtilMapper productUtilMapper;
 
     @Override
     public int create(ProductUtil member) {
-        return memberMapper.insertSelective(member);
+        return productUtilMapper.insertSelective(member);
     }
 
     @Override
     public int update(ProductUtil member) {
-        return memberMapper.updateByPrimaryKeySelective(member);
+        return productUtilMapper.updateByPrimaryKeySelective(member);
     }
 
     @Override
     public int delete(List<Long> ids) {
         int count = 0;
         for (long id:ids) {
-           count+= memberMapper.deleteByPrimaryKey(id);
+           count+= productUtilMapper.deleteByPrimaryKey(id);
         }
         return count;
     }
 
     @Override
     public int delete(Long id) {
-        return memberMapper.deleteByPrimaryKey(id);
+        return productUtilMapper.deleteByPrimaryKey(id);
     }
 
     @Override
     public ProductUtil list(Long id) {
-        return memberMapper.selectByPrimaryKey(id);
+        return productUtilMapper.selectByPrimaryKey(id);
     }
 
     @Override
     public List<ProductUtil> list() {
         ProductUtilExample example = new ProductUtilExample();
         example.createCriteria().andStatusEqualTo(1);
-        return memberMapper.selectByExample(null);
+        return productUtilMapper.selectByExample(example);
     }
 
     @Override
@@ -63,6 +64,35 @@ public class ProductUtilServiceImpl implements ProductUtilService {
         ProductUtilExample example = new ProductUtilExample();
         example.setOrderByClause("sort");
         //设置条件
-        return memberMapper.selectByExample(example);
+        return productUtilMapper.selectByExample(example);
+    }
+
+    @Override
+    public int updateStatus(Long id, Integer status) {
+        ProductUtil productUtil = new ProductUtil();
+        productUtil.setId(id);
+        productUtil.setStatus(status);
+        return productUtilMapper.updateByPrimaryKeySelective(productUtil);
+    }
+
+    @Override
+    public int sealed(List<Long> ids) {
+        AtomicInteger count = new AtomicInteger();
+        ids.forEach(item->{
+            count.getAndAdd(updateStatus(item,2))  ;
+        });
+        return count.get();
+    }
+
+    @Override
+    public int updateStatus(List<Long> ids, Integer status) {
+        int count=0;
+        for (Long id : ids) {
+            ProductUtil productUtil = new ProductUtil();
+            productUtil.setId(id);
+            productUtil.setStatus(status);
+            count+=productUtilMapper.updateByPrimaryKeySelective(productUtil);
+        }
+        return count;
     }
 }

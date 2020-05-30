@@ -73,7 +73,7 @@ public class ProductUtilController {
      * 查询所有
      */
     @GetMapping("/list")
-    @ApiOperation("查询所有物品单位")
+    @ApiOperation("查询状态为显示的物品单位")
     public CommonResult list() {
         List<ProductUtil> list = memberService.list();
         return CommonResult.success(list);
@@ -91,6 +91,36 @@ public class ProductUtilController {
         List<ProductUtil> memberList = memberService.list(keyword, pageSize, pageNum);
         return CommonResult.success(CommonPage.restPage(memberList));
 
+    }
+
+    /**
+     * 修改状态
+     */
+    @PostMapping("/updateStatus")
+    @ApiOperation("修改物品单位状态")
+    public CommonResult updateStatus(@RequestParam(value = "id", required = false) Long id,
+                               @RequestParam(value = "status", required = false) Integer status) {
+        return CommonResult.success(memberService.updateStatus(id,status) >0 ? true : false);
+    }
+
+    /**
+     * 批量修改状态
+     */
+    @PostMapping("/updateStatus/{status}")
+    @ApiOperation("修改物品单位状态")
+    public CommonResult updateStatus(@PathVariable(value = "status", required = true) Integer status,
+                                     @RequestBody List<Long>  ids) {
+        return CommonResult.success(memberService.updateStatus(ids,status) >0 ? true : false);
+    }
+
+
+    /**
+     * 批量封存
+     */
+    @PostMapping("/sealed")
+    @ApiOperation("修改物品单位状态")
+    public CommonResult sealed(@RequestBody List<Long>  ids) {
+        return CommonResult.success(memberService.sealed(ids) >0 ? true : false);
     }
 
 }

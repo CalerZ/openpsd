@@ -1,4 +1,4 @@
-package com.caler.zkl.openpsd.common;
+package com.caler.zkl.openpsd.bmg;
 
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;

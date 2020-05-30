@@ -3,9 +3,8 @@ package com.caler.zkl.openpsd.controller;
 import com.caler.zkl.openpsd.bean.*;
 import com.caler.zkl.openpsd.common.CommonPage;
 import com.caler.zkl.openpsd.common.CommonResult;
-import com.caler.zkl.openpsd.common.ProductExcelData;
+import com.caler.zkl.openpsd.bean.ExportProductData;
 import com.caler.zkl.openpsd.service.ApplicationService;
-import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,7 @@ public class ApplicationController {
     @ApiOperation("保存物品申请单")
     public CommonResult create(@RequestBody ApplicationProductPoJo applicationProductPoJo) {
         Application application = new Application();
-        convertObj(applicationProductPoJo, application);
+        convertObj(applicationProductPoJo, application,"");
         return CommonResult.success(applicationService.create(application) > 0 ? true : false);
     }
 
@@ -46,7 +45,7 @@ public class ApplicationController {
     @ApiOperation("提交物品申请单")
     public CommonResult submit(@RequestBody ApplicationProductPoJo applicationProductPoJo) {
         Application application = new Application();
-        convertObj(applicationProductPoJo, application);
+        convertObj(applicationProductPoJo, application,"");
         return CommonResult.success(applicationService.submit(application) > 0 ? true : false);
     }
 
@@ -57,7 +56,7 @@ public class ApplicationController {
     @ApiOperation("完成物品申请单")
     public CommonResult finish(@RequestBody ApplicationProductPoJo applicationProductPoJo) {
         Application application = new Application();
-        convertObj(applicationProductPoJo, application);
+        convertObj(applicationProductPoJo, application,"finish");
         return CommonResult.success(applicationService.finish(application) > 0 ? true : false);
     }
 
@@ -78,7 +77,7 @@ public class ApplicationController {
     @ApiOperation("修改物品申请单")
     public CommonResult update(@RequestBody ApplicationProductPoJo applicationProductPoJo) {
         Application application = new Application();
-        convertObj(applicationProductPoJo, application);
+        convertObj(applicationProductPoJo, application,"");
         return CommonResult.success(applicationService.update(application) > 0 ? true : false);
     }
 
@@ -148,9 +147,13 @@ public class ApplicationController {
     @PostMapping("/myApplicationList")
     @ApiOperation("我提交的申请单")
     public CommonResult myApplicationList(@RequestParam(value = "keyword", required = false) String keyword,
+                                          @RequestParam(value = "status", required = false) Integer status,
+                                          @RequestParam(value = "date1", required = false) String date1,
+                                          @RequestParam(value = "date2", required = false) String date2,
                                           @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize,
                                           @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum) {
-        List<ApplicationFormBean> applicationPageInfo = applicationService.myApplicationList(keyword, pageSize, pageNum);
+
+        List<ApplicationFormBean> applicationPageInfo = applicationService.myApplicationList(keyword,status,date1,date2,pageSize, pageNum);
         return CommonResult.success(CommonPage.restPage(applicationPageInfo));
 
     }
@@ -161,9 +164,12 @@ public class ApplicationController {
     @PostMapping("/reviewedApplicationList")
     @ApiOperation("待审核列表")
     public CommonResult reviewedApplicationList(@RequestParam(value = "keyword", required = false) String keyword,
+                                                @RequestParam(value = "applyUser", required = false) String applyUser,
+                                                @RequestParam(value = "date1", required = false) String date1,
+                                                @RequestParam(value = "date2", required = false) String date2,
                                                 @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize,
                                                 @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum) {
-        List<ApplicationFormBean> applicationPageInfo = applicationService.reviewedApplicationList(keyword, pageSize, pageNum);
+        List<ApplicationFormBean> applicationPageInfo = applicationService.reviewedApplicationList(keyword,applyUser,date1,date2, pageSize, pageNum);
         return CommonResult.success(CommonPage.restPage(applicationPageInfo));
 
     }
@@ -174,9 +180,12 @@ public class ApplicationController {
     @PostMapping("/finishApplicationList")
     @ApiOperation("查询审核通过记录列表")
     public CommonResult finishApplicationList(@RequestParam(value = "keyword", required = false) String keyword,
+                                              @RequestParam(value = "applyUser", required = false) String applyUser,
+                                              @RequestParam(value = "date1", required = false) String date1,
+                                              @RequestParam(value = "date2", required = false) String date2,
                                               @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize,
                                               @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum) {
-        List<ApplicationFormBean> applicationPageInfo = applicationService.finishApplicationList(keyword, pageSize, pageNum);
+        List<ApplicationFormBean> applicationPageInfo = applicationService.finishApplicationList(keyword,applyUser,date1,date2, pageSize, pageNum);
         return CommonResult.success(CommonPage.restPage(applicationPageInfo));
 
     }
@@ -195,34 +204,43 @@ public class ApplicationController {
 
 
     /**
-     * 生成申请单单号
+     * 查询导出物料列表
      */
     @PostMapping("/selectExcelData")
     @ApiOperation("查询导出物品列表")
     public CommonResult select(@RequestParam(value = "quarter", required = false) String quarter,
-                               @RequestParam(value = "date[]", required = false) String[] date,
+                               @RequestParam(value = "date1", required = false) String date1,
+                               @RequestParam(value = "date2", required = false) String date2,
                                @RequestParam(value = "year", required = false) String year,
                                @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize,
                                @RequestParam(value = "pageNum", required = true, defaultValue = "1") Integer pageNum) {
 
-        List<ProductExcelData> productExcelDatas = applicationService.getExcelDataList(date, quarter, year, pageSize, pageNum);
-        return CommonResult.success(CommonPage.restPage(productExcelDatas));
+        List<ExportProductData> exportProductData = applicationService.getExcelDataList(date1,date2, quarter, year, pageSize, pageNum);
+        return CommonResult.success(CommonPage.restPage(exportProductData));
 
 
     }
 
 
-    public void convertObj(ApplicationProductPoJo applicationProductPoJo, Application application) {
+    public void convertObj(ApplicationProductPoJo applicationProductPoJo, Application application, String type) {
         application.setApplicationForm(applicationProductPoJo.getApplicationForm());
         AtomicInteger count = new AtomicInteger();
         List<ApplicationProduct> applicationProducts = applicationProductPoJo.getApplicationProducts().stream().map(item -> {
             ApplicationProduct applicationProduct = new ApplicationProduct();
-            applicationProduct.setId(item.getId());
+            if(item.getProductId()==null){//创建
+//                创建的时候把物料的id给productid
+                applicationProduct.setProductId(item.getId());
+            }else{//修改
+                applicationProduct.setId(item.getId());
+                applicationProduct.setProductId(item.getProductId());
+            }
             applicationProduct.setProductName(item.getName());
             applicationProduct.setProductCode(item.getCode());
-            applicationProduct.setProductId(item.getId());
+
             applicationProduct.setType1(item.getProductType1().getId());
-            applicationProduct.setType2(item.getProductType2().getpId());
+            if(item.getProductType2()!=null){
+                applicationProduct.setType2(item.getProductType2().getId());
+            }
             applicationProduct.setDescription(item.getDescription());
             applicationProduct.setSpecifications(item.getSpecifications());
             applicationProduct.setUnit(item.getProductUtil().getId());
@@ -238,7 +256,11 @@ public class ApplicationController {
             applicationProduct.setIsDelete(item.getIsDelete());
             applicationProduct.setProdLineMembers(item.getStock().getProdLineMembers());
             applicationProduct.setPurchaseMethod(item.getPurchaseMethod().getId());
-            applicationProduct.setSupplierId( Long.valueOf(item.getSupplierId()) );
+            if ("finish".equals(type)){
+                applicationProduct.setSupplierId(Long.valueOf(item.getSupplierId()));
+            }else{
+                applicationProduct.setSupplierId(null);
+            }
             return applicationProduct;
         }).collect(Collectors.toList());
         application.setApplicationProducts(applicationProducts);
