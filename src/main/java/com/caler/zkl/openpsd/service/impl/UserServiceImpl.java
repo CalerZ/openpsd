@@ -52,7 +52,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        com.caler.zkl.openpsd.bean.User user = userMapper.selectByName(s);
+//        com.caler.zkl.openpsd.bean.User user = userMapper.selectByName(s);
+        com.caler.zkl.openpsd.bean.User user = selectByName(s);
         if (user == null) {
             throw new UsernameNotFoundException("用户名或密码错误");
         }

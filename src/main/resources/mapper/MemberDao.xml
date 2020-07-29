@@ -11,7 +11,7 @@
 
   <select id="selectMenuByMemberId" resultMap="com.caler.zkl.openpsd.mapper.MenuMapper.BaseResultMap">
 SELECT DISTINCT d.* FROM role_member_relation a,role b,role_menu_relation c, menu d
-WHERE  a.role_id = b.id and b.status=1   AND c.role_id = b.id AND c.menu_id =d.id and d.hidden=1 AND a.resource_id = #{id}
+WHERE  a.role_id = b.id and b.status=1   AND c.role_id = b.id AND c.menu_id =d.id and d.hidden=0 AND a.resource_id = #{id}
 
   </select>
 

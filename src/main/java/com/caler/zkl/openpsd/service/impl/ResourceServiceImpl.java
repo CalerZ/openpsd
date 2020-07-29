@@ -2,6 +2,7 @@ package com.caler.zkl.openpsd.service.impl;
 
 import com.caler.zkl.openpsd.bean.Resource;
 import com.caler.zkl.openpsd.bean.ResourceExample;
+import com.caler.zkl.openpsd.comp.DynamicSecurityMetadataSource;
 import com.caler.zkl.openpsd.mapper.ResourceMapper;
 import com.caler.zkl.openpsd.service.ResourceService;
 import com.github.pagehelper.PageHelper;
@@ -27,11 +28,13 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public int create(Resource resource) {
         resource.setCreateTime(new Date());
+
         return resourceMapper.insertSelective(resource);
     }
 
     @Override
     public int update(Resource resource) {
+
         return resourceMapper.updateByPrimaryKeySelective(resource);
     }
 
@@ -46,6 +49,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
     @Override
     public int delete(Long id) {
+
         return resourceMapper.deleteByPrimaryKey(id);
     }
 

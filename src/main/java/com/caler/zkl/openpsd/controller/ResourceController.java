@@ -3,6 +3,7 @@ package com.caler.zkl.openpsd.controller;
 import com.caler.zkl.openpsd.bean.Resource;
 import com.caler.zkl.openpsd.common.CommonPage;
 import com.caler.zkl.openpsd.common.CommonResult;
+import com.caler.zkl.openpsd.comp.DynamicSecurityMetadataSource;
 import com.caler.zkl.openpsd.service.ResourceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,6 +25,8 @@ public class ResourceController {
 
     @Autowired
     private ResourceService resourceService;
+    @Autowired
+    private DynamicSecurityMetadataSource dynamicSecurityMetadataSource;
 
     /**
      * 添加
@@ -31,7 +34,11 @@ public class ResourceController {
     @PostMapping("/insert")
     @ApiOperation("添加资源")
     public CommonResult create(@RequestBody Resource resource) {
+        if (dynamicSecurityMetadataSource!=null) {
+            dynamicSecurityMetadataSource.clearDataSource();
+        }
         return CommonResult.success(resourceService.create(resource) == 1 ? true : false);
+
     }
 
     /**
@@ -40,6 +47,9 @@ public class ResourceController {
     @PostMapping("/update")
     @ApiOperation("修改资源")
     public CommonResult update(@RequestBody Resource resource) {
+        if (dynamicSecurityMetadataSource!=null) {
+            dynamicSecurityMetadataSource.clearDataSource();
+        }
         return CommonResult.success(resourceService.update(resource) == 1 ? true : false);
     }
 
@@ -49,6 +59,9 @@ public class ResourceController {
     @PostMapping("/delete/{id}")
     @ApiOperation("批量删除资源")
     public CommonResult delete(@PathVariable(value = "id", required = true) Long id) {
+        if (dynamicSecurityMetadataSource!=null) {
+            dynamicSecurityMetadataSource.clearDataSource();
+        }
         return CommonResult.success(resourceService.delete(id) > 0 ? true : false);
     }
 
